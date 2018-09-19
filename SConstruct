@@ -63,5 +63,14 @@ for gene in genes:
                 ["lib/consensus.py", Value(min_coverage), Value(min_freq)] + \
                 ["scratch/MC{}.{}.hmmsearch2.codons.csv".format(dataset, gene) for dataset in datasets],
                 "python $SOURCES $TARGETS &> logs/consensus-{}.log".format(gene))
+    SrunCommand("scratch/unaligned/{}/consensus.hmmsearch.txt".format(gene),
+                ["scratch/{}.hmm".format(gene),
+                 "scratch/unaligned/{}/consensus.pfa".format(gene)],
+                "hmmsearch --notextw -o $TARGETS $SOURCES &> logs/consensus-hmmsearch-{}.log".format(gene))
+    env.Command("scratch/aligned/{}/consensus.fa".format(gene),
+                ["lib/codon-align.py",
+                 "scratch/unaligned/{}/consensus.fa".format(gene),
+                 "scratch/unaligned/{}/consensus.hmmsearch.txt".format(gene)],
+                "python $SOURCES > $TARGETS 2> logs/consensus-codon-align-{}.log".format(gene))
 
 # vim: syntax=python expandtab sw=4 ts=4
