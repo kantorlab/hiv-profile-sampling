@@ -28,26 +28,28 @@ def SrunCommand(targets, sources, cmd, wrap=False, prefix="", cpus=1, mem_per_cp
 for gene in genes:
     env.Command("scratch/{}.fa".format(gene),
                 ["lib/clean-alignment.py", "input/HIV1_FLT_2017_{}_PRO.fasta".format(gene)],
-                "python $SOURCES > $TARGET")
+                "python $SOURCES > $TARGET 2> logs/clean-alignment-{}.log".format(gene))
     SrunCommand("scratch/{}.hmm".format(gene),
                 "scratch/{}.fa".format(gene),
-                "hmmbuild $TARGET $SOURCE")
+                "hmmbuild $TARGET $SOURCE &> logs/hmmbuild-{}.log".format(gene))
 
 # hivmmer
 
 for gene in genes:
-    for i in datasets:
-        pass
-
-        ## hmmsearch round #1
-        #SrunCommand("scratch/MC{}.hmmsearch1.hmm".format(i),
-        #            ["lib/hmmsearch.sh",
-        #             env.Value(20),
-        #             "lib/revcomp_reads.py",
-        #             "scratch/MC{}.collapsed.fa".format(i),
-        #             "scratch/HIV1_ALL_2016_genome_DNA.hmm"],
-        #            "$SOURCES $TARGET",
-        #            cpus=20, mem_per_cpu=6)
-
+    for dataset in datasets:
+        SrunCommand(["scratch/MC{}.{}.hmmsearch1.codons.csv".format(dataset, gene),
+                     "scratch/MC{}.{}.hmmsearch1.aavf".format(dataset, gene),
+                     "scratch/MC{}.{}.hmmsearch2.codons.csv".format(dataset, gene),
+                     "scratch/MC{}.{}.hmmsearch2.aavf".format(dataset, gene),
+                     "scratch/MC{}.{}.pear.assembled.fastq".format(dataset, gene),
+                     "scratch/MC{}.{}.pear.unassembled.forward.fastq".format(dataset, gene),
+                     "scratch/MC{}.{}.pear.unassembled.reverse.fastq".format(dataset, gene),
+                     "scratch/MC{}.{}.pear.discarded.fastq".format(dataset, gene)],
+                    [Value("--id"), Value("scratch/MC{}.{}".format(dataset, gene)),
+                     Value("--fq1"), "input/MC{}_1.fastq.gz".format(dataset),
+                     Value("--fq2"), "input/MC{}_2.fastq.gz".format(dataset),
+                     Value("--ref"), "scratch/{}.hmm".format(gene)],
+                    "hivmmer --cpu $CPUS $SOURCES &> logs/hivmmer-MC{}-{}.log".format(dataset, gene),
+                    cpus=4)
 
 # vim: syntax=python expandtab sw=4 ts=4

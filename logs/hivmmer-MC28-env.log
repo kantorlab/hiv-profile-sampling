@@ -1,0 +1,105 @@
+srun: job 22309128 queued and waiting for resources
+srun: job 22309128 has been allocated resources
+ID:     scratch/MC28.env
+FQ1:    input/MC28_1.fastq.gz
+FQ2:    input/MC28_2.fastq.gz
+REF:    scratch/env.hmm
+CPU:    4
+REGION: pol
+STOPC:  
+### STAGE 1: PEAR ###
+ ____  _____    _    ____ 
+|  _ \| ____|  / \  |  _ \
+| |_) |  _|   / _ \ | |_) |
+|  __/| |___ / ___ \|  _ <
+|_|   |_____/_/   \_\_| \_\
+
+PEAR v0.9.11 [Nov 5, 2017]
+
+Citation - PEAR: a fast and accurate Illumina Paired-End reAd mergeR
+Zhang et al (2014) Bioinformatics 30(5): 614-620 | doi:10.1093/bioinformatics/btt593
+
+Forward reads file.................: input/MC28_1.fastq.gz
+Reverse reads file.................: input/MC28_2.fastq.gz
+PHRED..............................: 33
+Using empirical frequencies........: YES
+Statistical method.................: OES
+Maximum assembly length............: 999999
+Minimum assembly length............: 50
+p-value............................: 0.010000
+Quality score threshold (trimming).: 0
+Minimum read size after trimming...: 1
+Maximal ratio of uncalled bases....: 1.000000
+Minimum overlap....................: 10
+Scoring method.....................: Scaled score
+Threads............................: 4
+
+Allocating memory..................: 3,221,225,472 bytes
+Computing empirical frequencies....: DONE
+  A: 0.293301
+  C: 0.208708
+  G: 0.209256
+  T: 0.288735
+  31605 uncalled bases
+Assemblying reads: 0%Assemblying reads: 100%
+
+Assembled reads ...................: 327,232 / 438,635 (74.602%)
+Discarded reads ...................: 455 / 438,635 (0.104%)
+Not assembled reads ...............: 110,948 / 438,635 (25.294%)
+Assembled reads file...............: scratch/MC28.env.pear.assembled.fastq
+Discarded reads file...............: scratch/MC28.env.pear.discarded.fastq
+Unassembled forward reads file.....: scratch/MC28.env.pear.unassembled.forward.fastq
+Unassembled reverse reads file.....: scratch/MC28.env.pear.unassembled.reverse.fastq
+### STAGE 2: FASTX_COLLAPSER ###
+### STAGE 3: TRANSLATE ###
+/users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/Seq.py:2423: BiopythonWarning: Partial codon, len(sequence) not a multiple of three. Explicitly trim the sequence or add trailing N before translation. This may become an error in future.
+  BiopythonWarning)
+nreads 500273
+nskipped N 1
+nskipped * 189973
+### STAGE 4: HMMSEARCH, ROUND 1 ###
+# hmmbuild :: profile HMM construction from multiple sequence alignments
+# HMMER 3.2.1 (June 2018); http://hmmer.org/
+# Copyright (C) 2018 Howard Hughes Medical Institute.
+# Freely distributed under the BSD open source license.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# input alignment file:             scratch/MC28.env.hmmsearch1.sto
+# output HMM file:                  scratch/MC28.env.hmmsearch1.hmm
+# number of worker threads:         4
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# idx name                  nseq  alen  mlen eff_nseq re/pos description
+#---- -------------------- ----- ----- ----- -------- ------ -----------
+1     env                  215592  1072   858    15.90  0.590 
+
+# CPU time: 20.87u 1.65s 00:00:22.52 Elapsed: 00:00:22.52
+### STAGE 5: HMMSEARCH, ROUND 2 ###
+# hmmbuild :: profile HMM construction from multiple sequence alignments
+# HMMER 3.2.1 (June 2018); http://hmmer.org/
+# Copyright (C) 2018 Howard Hughes Medical Institute.
+# Freely distributed under the BSD open source license.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# input alignment file:             scratch/MC28.env.hmmsearch2.sto
+# output HMM file:                  scratch/MC28.env.hmmsearch2.hmm
+# number of worker threads:         4
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# idx name                  nseq  alen  mlen eff_nseq re/pos description
+#---- -------------------- ----- ----- ----- -------- ------ -----------
+1     env                  218588  1029   867    17.23  0.590 
+
+# CPU time: 18.97u 1.64s 00:00:20.61 Elapsed: 00:00:20.61
+### STAGE 6: CODON TABLE ###
+/users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
+  BiopythonExperimentalWarning)
+indexed reads
+parsed hmmer
+hsps: {1: 219256, 2: 156}
+constructed codon table
+/users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
+  BiopythonExperimentalWarning)
+indexed reads
+parsed hmmer
+hsps: {1: 327136, 2: 2958}
+constructed codon table
+### FINISHED ###
