@@ -1,6 +1,8 @@
 from Bio import SeqIO
 import sys
+
 n = 0
+
 for record in SeqIO.parse(sys.argv[1], "fasta"):
     seq = str(record.seq).replace("#", "-").replace("?", "-").replace("$", "*")
     if n == 0:
@@ -11,3 +13,5 @@ for record in SeqIO.parse(sys.argv[1], "fasta"):
         seq = "".join((seq, "-" * d, "*"))
     print(">{}".format(record.id))
     print(seq)
+
+# vim: syntax=python expandtab sw=4 ts=4

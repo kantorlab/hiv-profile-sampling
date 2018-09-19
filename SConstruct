@@ -7,6 +7,9 @@ env.Decider("MD5-timestamp")
 datasets = [13, 17, 19, 21, 23, 24, 25, 26, 27, 28, 29, 30, 32, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 58, 59, 60]
 genes = ["pol", "gag", "env"]
 
+min_coverage = 10
+min_freq = 0.01
+
 # If your SLURM culster requires additional parameters, you can include them in
 # this command.
 srun = None
@@ -51,5 +54,14 @@ for gene in genes:
                      Value("--ref"), "scratch/{}.hmm".format(gene)],
                     "hivmmer --cpu $CPUS $SOURCES &> logs/hivmmer-MC{}-{}.log".format(dataset, gene),
                     cpus=4)
+
+# consensus
+
+for gene in genes:
+    env.Command(["scratch/unaligned/{}/consensus.fa".format(gene),
+                 "scratch/unaligned/{}/consensus.pfa".format(gene)],
+                ["lib/consensus.py", Value(min_coverage), Value(min_freq)] + \
+                ["scratch/MC{}.{}.hmmsearch2.codons.csv".format(dataset, gene) for dataset in datasets],
+                "python $SOURCES $TARGETS &> logs/consensus-{}.log".format(gene))
 
 # vim: syntax=python expandtab sw=4 ts=4
