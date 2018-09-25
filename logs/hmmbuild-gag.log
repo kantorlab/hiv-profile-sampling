@@ -1,16 +1,16 @@
-srun: job 22309133 queued and waiting for resources
-srun: job 22309133 has been allocated resources
+srun: job 229584 queued and waiting for resources
+srun: job 229584 has been allocated resources
 # hmmbuild :: profile HMM construction from multiple sequence alignments
 # HMMER 3.2.1 (June 2018); http://hmmer.org/
 # Copyright (C) 2018 Howard Hughes Medical Institute.
 # Freely distributed under the BSD open source license.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# input alignment file:             scratch/gag.fa
-# output HMM file:                  scratch/gag.hmm
+# input alignment file:             scratch/reference/gag.fa
+# output HMM file:                  scratch/reference/gag.hmm
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # idx name                  nseq  alen  mlen eff_nseq re/pos description
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     gag                   5259   603   499     0.63  0.592 
 
-# CPU time: 1.61u 0.02s 00:00:01.63 Elapsed: 00:00:01.65
+# CPU time: 0.85u 0.02s 00:00:00.87 Elapsed: 00:00:01.05

@@ -3,10 +3,11 @@ import pandas as pd
 import sys
 
 from Bio import Seq
+from itertools import groupby
+from operator import attrgetter
 
 min_coverage = int(sys.argv[1])
-min_freq     = float(sys.argv[2])
-csvfiles     = sys.argv[3:-2]
+csvfiles     = sys.argv[2:-2]
 ntfile       = sys.argv[-2]
 aafile       = sys.argv[-1]
 
@@ -18,17 +19,12 @@ with open(ntfile, "w") as nt, open(aafile, "w") as aa:
         print(">{}".format(dataset), file=nt)
         print(">{}".format(dataset), file=aa)
 
-        codons = pd.read_csv(csvfile)
-        codons[codons < min_coverage] = 0
-        codons = codons.div(codons.sum(axis=1), axis=0)
-        codons[codons < min_freq] = 0
-
+        codons = pd.read_csv(csvfile, sep="\t").fillna("")
         seq = []
-        for _, row in codons.iterrows():
-            if row.sum() > 0:
-                codon = max(row.index, key=lambda x: row[x])
-                if codon != "del" and codon[:3] != "ins":
-                    seq.append(codon)
+        for _, group in groupby(codons.itertuples(), key=attrgetter("pos")):
+            row = next(group)
+            if (row.freq >= min_coverage):
+                seq.append(row.codon)
 
         print("".join(seq), file=nt)
         print("".join(Seq.translate(codon) for codon in seq), file=aa)

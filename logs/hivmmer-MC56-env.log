@@ -1,9 +1,9 @@
-srun: job 22310771 queued and waiting for resources
-srun: job 22310771 has been allocated resources
-ID:     scratch/MC56.env
+srun: job 230943 queued and waiting for resources
+srun: job 230943 has been allocated resources
+ID:     scratch/hivmmer/env/MC56
 FQ1:    input/MC56_1.fastq.gz
 FQ2:    input/MC56_2.fastq.gz
-REF:    scratch/env.hmm
+REF:    scratch/reference/env.hmm
 CPU:    4
 REGION: pol
 STOPC:  
@@ -46,10 +46,10 @@ Assemblying reads: 0%Assemblying reads: 100%
 Assembled reads ...................: 437,978 / 480,727 (91.107%)
 Discarded reads ...................: 886 / 480,727 (0.184%)
 Not assembled reads ...............: 41,863 / 480,727 (8.708%)
-Assembled reads file...............: scratch/MC56.env.pear.assembled.fastq
-Discarded reads file...............: scratch/MC56.env.pear.discarded.fastq
-Unassembled forward reads file.....: scratch/MC56.env.pear.unassembled.forward.fastq
-Unassembled reverse reads file.....: scratch/MC56.env.pear.unassembled.reverse.fastq
+Assembled reads file...............: scratch/hivmmer/env/MC56.pear.assembled.fastq
+Discarded reads file...............: scratch/hivmmer/env/MC56.pear.discarded.fastq
+Unassembled forward reads file.....: scratch/hivmmer/env/MC56.pear.unassembled.forward.fastq
+Unassembled reverse reads file.....: scratch/hivmmer/env/MC56.pear.unassembled.reverse.fastq
 ### STAGE 2: FASTX_COLLAPSER ###
 ### STAGE 3: TRANSLATE ###
 /users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/Seq.py:2423: BiopythonWarning: Partial codon, len(sequence) not a multiple of three. Explicitly trim the sequence or add trailing N before translation. This may become an error in future.
@@ -63,8 +63,8 @@ nskipped * 63602
 # Copyright (C) 2018 Howard Hughes Medical Institute.
 # Freely distributed under the BSD open source license.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# input alignment file:             scratch/MC56.env.hmmsearch1.sto
-# output HMM file:                  scratch/MC56.env.hmmsearch1.hmm
+# input alignment file:             scratch/hivmmer/env/MC56.hmmsearch1.sto
+# output HMM file:                  scratch/hivmmer/env/MC56.hmmsearch1.hmm
 # number of worker threads:         4
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -72,15 +72,15 @@ nskipped * 63602
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     env                  84051   901   857    10.24  0.590 
 
-# CPU time: 5.26u 0.49s 00:00:05.75 Elapsed: 00:00:05.76
+# CPU time: 3.89u 0.40s 00:00:04.29 Elapsed: 00:00:04.30
 ### STAGE 5: HMMSEARCH, ROUND 2 ###
 # hmmbuild :: profile HMM construction from multiple sequence alignments
 # HMMER 3.2.1 (June 2018); http://hmmer.org/
 # Copyright (C) 2018 Howard Hughes Medical Institute.
 # Freely distributed under the BSD open source license.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# input alignment file:             scratch/MC56.env.hmmsearch2.sto
-# output HMM file:                  scratch/MC56.env.hmmsearch2.hmm
+# input alignment file:             scratch/hivmmer/env/MC56.hmmsearch2.sto
+# output HMM file:                  scratch/hivmmer/env/MC56.hmmsearch2.hmm
 # number of worker threads:         4
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -88,7 +88,7 @@ nskipped * 63602
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     env                  86264   908   856    11.11  0.590 
 
-# CPU time: 5.41u 0.50s 00:00:05.91 Elapsed: 00:00:05.96
+# CPU time: 4.01u 0.43s 00:00:04.43 Elapsed: 00:00:04.45
 ### STAGE 6: CODON TABLE ###
 /users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
   BiopythonExperimentalWarning)

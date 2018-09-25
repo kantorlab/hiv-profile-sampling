@@ -1,9 +1,9 @@
-srun: job 22310690 queued and waiting for resources
-srun: job 22310690 has been allocated resources
-ID:     scratch/MC53.env
+srun: job 230936 queued and waiting for resources
+srun: job 230936 has been allocated resources
+ID:     scratch/hivmmer/env/MC53
 FQ1:    input/MC53_1.fastq.gz
 FQ2:    input/MC53_2.fastq.gz
-REF:    scratch/env.hmm
+REF:    scratch/reference/env.hmm
 CPU:    4
 REGION: pol
 STOPC:  
@@ -46,10 +46,10 @@ Assemblying reads: 0%Assemblying reads: 100%
 Assembled reads ...................: 522,981 / 569,031 (91.907%)
 Discarded reads ...................: 505 / 569,031 (0.089%)
 Not assembled reads ...............: 45,545 / 569,031 (8.004%)
-Assembled reads file...............: scratch/MC53.env.pear.assembled.fastq
-Discarded reads file...............: scratch/MC53.env.pear.discarded.fastq
-Unassembled forward reads file.....: scratch/MC53.env.pear.unassembled.forward.fastq
-Unassembled reverse reads file.....: scratch/MC53.env.pear.unassembled.reverse.fastq
+Assembled reads file...............: scratch/hivmmer/env/MC53.pear.assembled.fastq
+Discarded reads file...............: scratch/hivmmer/env/MC53.pear.discarded.fastq
+Unassembled forward reads file.....: scratch/hivmmer/env/MC53.pear.unassembled.forward.fastq
+Unassembled reverse reads file.....: scratch/hivmmer/env/MC53.pear.unassembled.reverse.fastq
 ### STAGE 2: FASTX_COLLAPSER ###
 ### STAGE 3: TRANSLATE ###
 /users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/Seq.py:2423: BiopythonWarning: Partial codon, len(sequence) not a multiple of three. Explicitly trim the sequence or add trailing N before translation. This may become an error in future.
@@ -63,8 +63,8 @@ nskipped * 169963
 # Copyright (C) 2018 Howard Hughes Medical Institute.
 # Freely distributed under the BSD open source license.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# input alignment file:             scratch/MC53.env.hmmsearch1.sto
-# output HMM file:                  scratch/MC53.env.hmmsearch1.hmm
+# input alignment file:             scratch/hivmmer/env/MC53.hmmsearch1.sto
+# output HMM file:                  scratch/hivmmer/env/MC53.hmmsearch1.hmm
 # number of worker threads:         4
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -72,15 +72,15 @@ nskipped * 169963
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     env                  55157   924   851     9.11  0.590 
 
-# CPU time: 5.30u 0.38s 00:00:05.68 Elapsed: 00:00:05.72
+# CPU time: 3.07u 0.28s 00:00:03.34 Elapsed: 00:00:03.36
 ### STAGE 5: HMMSEARCH, ROUND 2 ###
 # hmmbuild :: profile HMM construction from multiple sequence alignments
 # HMMER 3.2.1 (June 2018); http://hmmer.org/
 # Copyright (C) 2018 Howard Hughes Medical Institute.
 # Freely distributed under the BSD open source license.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# input alignment file:             scratch/MC53.env.hmmsearch2.sto
-# output HMM file:                  scratch/MC53.env.hmmsearch2.hmm
+# input alignment file:             scratch/hivmmer/env/MC53.hmmsearch2.sto
+# output HMM file:                  scratch/hivmmer/env/MC53.hmmsearch2.hmm
 # number of worker threads:         4
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -88,7 +88,7 @@ nskipped * 169963
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     env                  56679   915   855     9.50  0.590 
 
-# CPU time: 5.37u 0.40s 00:00:05.77 Elapsed: 00:00:05.78
+# CPU time: 3.06u 0.31s 00:00:03.37 Elapsed: 00:00:03.37
 ### STAGE 6: CODON TABLE ###
 /users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
   BiopythonExperimentalWarning)
@@ -96,7 +96,7 @@ indexed reads
 parsed hmmer
 hsps: {1: 57453, 2: 4}
 constructed codon table
-/gpfs_home/mhowison/code/hivmmer/scripts/hivmmer-codons:142: RuntimeWarning: divide by zero encountered in true_divide
+/gpfs_home/mhowison/code/hivmmer/scripts/hivmmer-codons:166: RuntimeWarning: divide by zero encountered in true_divide
   norm = 1.0 / cov
 /users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
   BiopythonExperimentalWarning)
