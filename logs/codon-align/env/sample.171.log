@@ -1,0 +1,6 @@
+srun: job 244627 queued and waiting for resources
+srun: job 244627 has been allocated resources
+/users/mhowison/anaconda3/envs/hiv-profile-sampling/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
+  BiopythonExperimentalWarning)
+indexing reads
+parsing hmmer

@@ -10,7 +10,7 @@ genes = ["pol", "gag", "env"]
 
 min_coverage = 10
 min_freq = 0.01
-nsamples = 10
+nsamples = 500
 
 np.random.seed(919047801)
 seeds = [np.random.randint(1000000000) for _ in range(nsamples)]
@@ -36,10 +36,10 @@ def SrunCommand(targets, sources, cmd, wrap=False, prefix="", cpus=1, mem_per_cp
 for gene in genes:
     env.Command("scratch/reference/{}.fa".format(gene),
                 ["lib/clean-alignment.py", "input/HIV1_FLT_2017_{}_PRO.fasta".format(gene)],
-                "python $SOURCES > $TARGET 2> logs/clean-alignment-{}.log".format(gene))
+                "python $SOURCES > $TARGET 2> logs/clean-alignment/{}.log".format(gene))
     SrunCommand("scratch/reference/{}.hmm".format(gene),
                 "scratch/reference/{}.fa".format(gene),
-                "hmmbuild $TARGET $SOURCE &> logs/hmmbuild-{}.log".format(gene))
+                "hmmbuild $TARGET $SOURCE &> logs/hmmbuild/{}.log".format(gene))
 
 # hivmmer
 
@@ -59,7 +59,7 @@ for gene in genes:
                      Value("--fq1"), "input/MC{}_1.fastq.gz".format(dataset),
                      Value("--fq2"), "input/MC{}_2.fastq.gz".format(dataset),
                      Value("--ref"), "scratch/reference/{}.hmm".format(gene)],
-                    "hivmmer --cpu $CPUS $SOURCES &> logs/hivmmer-MC{}-{}.log".format(dataset, gene),
+                    "hivmmer --cpu $CPUS $SOURCES &> logs/hivmmer/{}/MC{}.log".format(gene, dataset),
                     cpus=4)
 
 # consensus
@@ -69,16 +69,16 @@ for gene in genes:
                  "scratch/unaligned/{}/consensus.pfa".format(gene)],
                 ["lib/consensus.py", Value(min_coverage)] + \
                 ["scratch/hivmmer/{}/MC{}.hmmsearch2.codons.txt".format(gene, dataset) for dataset in datasets],
-                "python $SOURCES $TARGETS &> logs/consensus-{}.log".format(gene))
+                "python $SOURCES $TARGETS &> logs/consensus/{}.log".format(gene))
     SrunCommand("scratch/unaligned/{}/consensus.hmmsearch.txt".format(gene),
                 ["scratch/reference/{}.hmm".format(gene),
                  "scratch/unaligned/{}/consensus.pfa".format(gene)],
-                "hmmsearch --notextw -o $TARGETS $SOURCES &> logs/consensus-hmmsearch-{}.log".format(gene))
+                "hmmsearch --notextw -o $TARGETS $SOURCES &> logs/hmmsearch/{}/consensus.log".format(gene))
     SrunCommand("scratch/aligned/{}/consensus.fa".format(gene),
                 ["lib/codon-align.py",
                  "scratch/unaligned/{}/consensus.fa".format(gene),
                  "scratch/unaligned/{}/consensus.hmmsearch.txt".format(gene)],
-                "python $SOURCES > $TARGETS 2> logs/consensus-codon-align-{}.log".format(gene))
+                "python $SOURCES > $TARGETS 2> logs/codon-align/{}/consensus.log".format(gene))
 
 # samples
 
@@ -88,15 +88,42 @@ for gene in genes:
                      "scratch/unaligned/{}/sample.{}.pfa".format(gene, i)],
                     ["lib/sample.py", Value(seed), Value(min_coverage), Value(min_freq)] + \
                     ["scratch/hivmmer/{}/MC{}.hmmsearch2.codons.txt".format(gene, dataset) for dataset in datasets],
-                    "python $SOURCES $TARGETS &> logs/sample-{}-{}.log".format(gene, i))
+                    "python $SOURCES $TARGETS &> logs/sample/{}/{}.log".format(gene, i))
         SrunCommand("scratch/unaligned/{}/sample.{}.hmmsearch.txt".format(gene, i),
                     ["scratch/reference/{}.hmm".format(gene),
                      "scratch/unaligned/{}/sample.{}.pfa".format(gene, i)],
-                    "hmmsearch --notextw -o $TARGETS $SOURCES &> logs/sample-hmmsearch-{}-{}.log".format(gene, i))
+                    "hmmsearch --notextw -o $TARGETS $SOURCES &> logs/hmmsearch/{}/sample.{}log".format(gene, i))
         SrunCommand("scratch/aligned/{}/sample.{}.fa".format(gene, i),
                     ["lib/codon-align.py",
                      "scratch/unaligned/{}/sample.{}.fa".format(gene, i),
                      "scratch/unaligned/{}/sample.{}.hmmsearch.txt".format(gene, i)],
-                    "python $SOURCES > $TARGETS 2> logs/sample-codon-align-{}-{}.log".format(gene, i))
+                    "python $SOURCES > $TARGETS 2> logs/codon-align/{}/sample.{}.log".format(gene, i))
+
+# trees
+
+for gene in ["pol"]:
+    SrunCommand(["scratch/trees/{}/RAxML_info.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bipartitions.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bipartitionsBranchLabels.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bootstrap.consensus".format(gene)],
+                ["lib/raxml.sh",
+                 "scratch/aligned/{}/consensus.fa".format(gene),
+                 Value(100),
+                 Value("GTRGAMMA")],
+                "bash $SOURCES $CPUS scratch/trees/{0} consensus &> logs/raxml/{0}/consensus.log".format(gene),
+                cpus=20)
+    for i in range(nsamples):
+        SrunCommand(["scratch/trees/{}/RAxML_info.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bipartitions.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bipartitionsBranchLabels.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bootstrap.sample.{}".format(gene, i)],
+                    ["lib/raxml.sh",
+                     "scratch/aligned/{}/sample.{}.fa".format(gene, i),
+                     Value(100),
+                     Value("GTRGAMMA")],
+                    "bash $SOURCES $CPUS scratch/trees/{0} sample.{1} &> logs/raxml/{0}/sample.{1}.log".format(gene, i),
+                    cpus=20)
 
 # vim: syntax=python expandtab sw=4 ts=4
