@@ -99,9 +99,26 @@ for gene in genes:
                      "scratch/unaligned/{}/sample.{}.hmmsearch.txt".format(gene, i)],
                     "python $SOURCES > $TARGETS 2> logs/codon-align/{}/sample.{}.log".format(gene, i))
 
+# concatenated alignments
+
+env.Command("scratch/aligned/gag-pol-env/consensus.fa",
+            ["lib/concat.py",
+             "scratch/aligned/gag/consensus.fa",
+             "scratch/aligned/pol/consensus.fa",
+             "scratch/aligned/env/consensus.fa"],
+            "python $SOURCES $TARGET &> logs/concat/gag-pol-env/consensus.log")
+
+for i in range(nsamples):
+    env.Command("scratch/aligned/gag-pol-env/sample.{}.fa".format(i),
+                ["lib/concat.py",
+                 "scratch/aligned/gag/sample.{}.fa".format(i),
+                 "scratch/aligned/pol/sample.{}.fa".format(i),
+                 "scratch/aligned/env/sample.{}.fa".format(i)],
+                "python $SOURCES $TARGET &> logs/concat/gag-pol-env/sample.{}.log".format(i))
+
 # trees
 
-for gene in ["pol"]:
+for gene in ["pol", "gag-pol-env"]:
     SrunCommand(["scratch/trees/{}/RAxML_info.consensus".format(gene),
                  "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
                  "scratch/trees/{}/RAxML_bipartitions.consensus".format(gene),
