@@ -46,6 +46,17 @@ for name, genelist in genes.items():
                     ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene) for gene in genelist],
                     "python $SOURCES $TARGETS".format(name, dataset))
 
+# alignments
+
+for name in genes:
+    for i in range(nsamples):
+        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
+                     "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
+                    ["lib/select-sample.py", Value(i)] + \
+                    ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets],
+                    "python $SOURCES | mafft --op 2 --thread $CPUS --auto - 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
+                    wrap=True)
+
 # trees
 
 #for gene in ["prrt", "int", "wgs"]:
