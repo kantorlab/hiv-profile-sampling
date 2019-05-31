@@ -9,17 +9,16 @@ Install Miniconda 3 with:
 
 After setting up Miniconda, install dependencies from the kantorlab channel with:
 
-    conda create -n hiv-profile-sampling -c kantorlab hivmmer=0.1.2 mafft=7.313 raxml=8.2.12 scons=3.0.1.1
+    conda create -n hiv-profile-sampling -c kantorlab mafft=7.313 raxml=8.2.12 scons=3.0.1.1
 
 To activate the environment, use:
 
     source activate hiv-profile-sampling
 
-Setup your scratch and cache directories on Oscar:
+Setup your scratch directory on Oscar:
 
     mkdir -p /gpfs/scratch/$USER/hiv-profile-sampling
     ln -s /gpfs/scratch/$USER/hiv-profile-sampling scratch
-    ln -s /gpfs/scratch/mhowison/hiv-profile-sampling-cache cache
 
 ## Running
 
