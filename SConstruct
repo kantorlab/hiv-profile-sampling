@@ -46,9 +46,19 @@ for name, genelist in genes.items():
                     ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene) for gene in genelist],
                     "python $SOURCES $TARGETS".format(name, dataset))
 
+# consensus
+
+for name, genelist in genes.items():
+    env.Command("scratch/unaligned/{}/consensus.fa".format(name),
+                ["lib/consensus.py"] + ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene)
+                                        for dataset in datasets
+                                        for gene in genelist],
+                "python $SOURCES $TARGETS")
+
 # alignments
 
 for name in genes:
+
     for i in range(nsamples):
         SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
                      "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
@@ -56,6 +66,12 @@ for name in genes:
                     ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets],
                     "python $SOURCES | mafft --op 2 --thread $CPUS --auto - 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
                     wrap=True)
+
+    SrunCommand(["scratch/aligned/{}/consensus.fa".format(name),
+                 "scratch/aligned/{}/consensus.fa.log".format(name)],
+                "scratch/unaligned/{}/consensus.fa".format(name),
+                "mafft --op 2 --thread $CPUS --auto $SOURCES 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
+                wrap=True)
 
 # trees
 
