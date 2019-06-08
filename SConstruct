@@ -37,39 +37,39 @@ def SrunCommand(targets, sources, cmd, wrap=False, prefix="", cpus=1, mem_per_cp
         cmd = "{} {}".format(prefix, cmd)
     return env.Command(targets, sources, cmd)
 
-# samples
 
-for name, genelist in genes.items():
+for gene in sum(genes.values(), []):
+
+    # samples
     for i, dataset in enumerate(datasets):
-        SrunCommand("scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset),
-                    ["lib/sample.py", Value(nsamples), Value(seeds[i])] + \
-                    ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene) for gene in genelist],
-                    "python $SOURCES $TARGETS".format(name, dataset))
+        SrunCommand(["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset)],
+                    ["lib/sample.py",
+                     Value(nsamples),
+                     Value(seeds[i]),
+                     "{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene)],
+                    "python $SOURCES $TARGETS".format(gene, dataset))
 
-# consensus
-
-for name, genelist in genes.items():
-    env.Command("scratch/unaligned/{}/consensus.fa".format(name),
+    # consensus
+    SrunCommand(["scratch/unaligned/{}/consensus.fa".format(gene)],
                 ["lib/consensus.py"] + ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene)
-                                        for dataset in datasets
-                                        for gene in genelist],
+                                        for dataset in datasets],
                 "python $SOURCES $TARGETS")
 
-# alignments
+    # alignments
 
-for name in genes:
-
-    for i in range(nsamples):
-        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
-                     "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
-                    ["lib/select-sample.py", Value(i)] + \
-                    ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets],
-                    "python $SOURCES | mafft --op 2 --thread $CPUS --auto - 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
-                    wrap=True)
-
-    SrunCommand(["scratch/aligned/{}/consensus.fa".format(name),
-                 "scratch/aligned/{}/consensus.fa.log".format(name)],
-                "scratch/unaligned/{}/consensus.fa".format(name),
+#for name in genes:
+#
+#    for i in range(nsamples):
+#        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
+#                     "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
+#                    ["lib/select-sample.py", Value(i)] + \
+#                    ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets],
+#                    "python $SOURCES | mafft --op 2 --thread $CPUS --auto - 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
+#                    wrap=True)
+#
+    SrunCommand(["scratch/aligned/{}/consensus.fa".format(gene),
+                 "scratch/aligned/{}/consensus.fa.log".format(gene)],
+                ["scratch/unaligned/{}/consensus.fa".format(gene)],
                 "mafft --op 2 --thread $CPUS --auto $SOURCES 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
                 wrap=True)
 
