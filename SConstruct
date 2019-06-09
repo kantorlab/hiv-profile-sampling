@@ -60,25 +60,27 @@ for gene in sum(genes.values(), []):
     # alignments
 
     for i in range(nsamples):
-        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
-                     "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
+        SrunCommand(["scratch/aligned/{}/sample.{}.aa.fa".format(gene, i),
+                     "scratch/aligned/{}/sample.{}.fa".format(gene, i),
+                     "scratch/aligned/{}/sample.{}.fa.log".format(gene, i)],
                     ["lib/select-sample.py",
                      Value(i)] + \
-                    ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets] + \
+                    ["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset) for dataset in datasets] + \
                     [Value("|"),
                      Value("python"),
                      "lib/codon-align.py",
                      Value("-"),
                      "data/{}.hmm".format(gene)],
-                    "python $SOURCES ${TARGETS[0]} 2> ${TARGETS[1]}",
+                    "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}",
                     wrap=True)
 
-    SrunCommand(["scratch/aligned/{}/consensus.fa".format(gene),
+    SrunCommand(["scratch/aligned/{}/consensus.pfam".format(gene),
+                 "scratch/aligned/{}/consensus.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa.log".format(gene)],
                 ["lib/codon-align.py",
                  "scratch/unaligned/{}/consensus.fa".format(gene),
                  "data/{}.hmm".format(gene)],
-                "python $SOURCES $SOURCES ${TARGETS[0]} 2> ${TARGETS[1]}")
+                "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
     # concatenate wgs
 
