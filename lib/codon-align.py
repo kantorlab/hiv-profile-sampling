@@ -1,7 +1,6 @@
 import sys
-from Bio import Seq, SeqIO
-from io import StringIO
-from subprocess import Popen, PIPE
+from Bio import AlignIO, Seq, SeqIO
+from subprocess import Popen, PIPE, run
 
 in_file, ref_file, out_aa_file, out_nt_file = sys.argv[1:]
 
@@ -16,8 +15,17 @@ else:
 aa_sequences = "\n".join(">{}\n{}".format(record.id, record.seq.translate()) for record in nt_sequences)
 
 # Align with hmmer
-with Popen(["hmmalign", "--amino", "--outformat", "pfam", "-o", out_aa_file, ref_file, "-"], stdin=PIPE) as hmmalign:
+with Popen(["hmmalign", "--trim", "--amino", "--outformat", "pfam", "-o", out_aa_file, ref_file, "-"], stdin=PIPE) as hmmalign:
     hmmalign.communicate(bytes(aa_sequences, "ascii"))
+
+AlignIO.convert(out_aa_file, "stockholm", out_aa_file + ".fa", "fasta")
+
+run(["hmmbuild", "--plaplace", "--amino", out_aa_file + ".hmm", out_aa_file])
+
+with Popen(["hmmalign", "--amino", "--outformat", "pfam", "-o", out_aa_file, out_aa_file + ".hmm", "-"], stdin=PIPE) as hmmalign:
+    hmmalign.communicate(bytes(aa_sequences, "ascii"))
+
+AlignIO.convert(out_aa_file, "stockholm", out_aa_file + ".2.fa", "fasta")
 
 # Convert aligned AA to codons
 nt_sequences = dict((record.id, record.seq) for record in nt_sequences)
