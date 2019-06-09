@@ -1,8 +1,8 @@
 import sys
-from Bio import AlignIO, Seq, SeqIO
-from subprocess import Popen, PIPE, run
+from Bio import Seq, SeqIO
+from subprocess import Popen, PIPE
 
-in_file, ref_file, out_aa_file, out_nt_file = sys.argv[1:]
+in_file, out_aa_file, out_nt_file = sys.argv[1:]
 
 # Read nucleotide sequences
 if in_file == "-":
@@ -14,23 +14,15 @@ else:
 # Translate to AA
 aa_sequences = "\n".join(">{}\n{}".format(record.id, record.seq.translate()) for record in nt_sequences)
 
-# Align with hmmer
-with Popen(["hmmalign", "--trim", "--amino", "--outformat", "pfam", "-o", out_aa_file, ref_file, "-"], stdin=PIPE) as hmmalign:
-    hmmalign.communicate(bytes(aa_sequences, "ascii"))
-
-AlignIO.convert(out_aa_file, "stockholm", out_aa_file + ".fa", "fasta")
-
-run(["hmmbuild", "--plaplace", "--amino", out_aa_file + ".hmm", out_aa_file])
-
-with Popen(["hmmalign", "--amino", "--outformat", "pfam", "-o", out_aa_file, out_aa_file + ".hmm", "-"], stdin=PIPE) as hmmalign:
-    hmmalign.communicate(bytes(aa_sequences, "ascii"))
-
-AlignIO.convert(out_aa_file, "stockholm", out_aa_file + ".2.fa", "fasta")
+# Align with mafft
+with open(out_aa_file, "w") as f:
+    with Popen(["mafft", "-"], stdin=PIPE, stdout=f) as mafft:
+        mafft.communicate(bytes(aa_sequences, "ascii"))
 
 # Convert aligned AA to codons
 nt_sequences = dict((record.id, record.seq) for record in nt_sequences)
 with open(out_nt_file, "w") as f:
-    for record in SeqIO.parse(out_aa_file, "stockholm"):
+    for record in SeqIO.parse(out_aa_file, "fasta"):
         print(">{}".format(record.id), file=f)
         aa_seq = str(record.seq)
         nt_seq = str(nt_sequences[record.id])
@@ -41,7 +33,7 @@ with open(out_nt_file, "w") as f:
                 f.write("---")
             else:
                 codon = nt_seq[i:i+3]
-                assert Seq.translate(codon) == aa.upper(), "{} = {}".format(Seq.translate(codon), aa)
+                assert Seq.translate(codon) == aa.upper()
                 f.write(codon)
                 i += 3
         f.write("\n")

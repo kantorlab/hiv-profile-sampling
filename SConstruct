@@ -69,17 +69,15 @@ for gene in sum(genes.values(), []):
                     [Value("|"),
                      Value("python"),
                      "lib/codon-align.py",
-                     Value("-"),
-                     "data/{}.hmm".format(gene)],
+                     Value("-")],
                     "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}",
                     wrap=True)
 
-    SrunCommand(["scratch/aligned/{}/consensus.pfam".format(gene),
+    SrunCommand(["scratch/aligned/{}/consensus.aa.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa.log".format(gene)],
                 ["lib/codon-align.py",
-                 "scratch/unaligned/{}/consensus.fa".format(gene),
-                 "data/{}.hmm".format(gene)],
+                 "scratch/unaligned/{}/consensus.fa".format(gene)],
                 "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
     # concatenate wgs
