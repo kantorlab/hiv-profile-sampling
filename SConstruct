@@ -41,6 +41,7 @@ def SrunCommand(targets, sources, cmd, wrap=False, prefix="", cpus=1, mem_per_cp
 for gene in sum(genes.values(), []):
 
     # samples
+
     for i, dataset in enumerate(datasets):
         SrunCommand(["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset)],
                     ["lib/sample.py",
@@ -50,6 +51,7 @@ for gene in sum(genes.values(), []):
                     "python $SOURCES $TARGETS".format(gene, dataset))
 
     # consensus
+
     SrunCommand(["scratch/unaligned/{}/consensus.fa".format(gene)],
                 ["lib/consensus.py"] + ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene)
                                         for dataset in datasets],
@@ -57,21 +59,29 @@ for gene in sum(genes.values(), []):
 
     # alignments
 
-#for name in genes:
-#
-#    for i in range(nsamples):
-#        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
-#                     "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
-#                    ["lib/select-sample.py", Value(i)] + \
-#                    ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets],
-#                    "python $SOURCES | mafft --op 2 --thread $CPUS --auto - 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
-#                    wrap=True)
-#
+    for i in range(nsamples):
+        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(name, i),
+                     "scratch/aligned/{}/sample.{}.fa.log".format(name, i)],
+                    ["lib/select-sample.py",
+                     Value(i)] + \
+                    ["scratch/unaligned/{}/sample.MC{}.fa".format(name, dataset) for dataset in datasets] + \
+                    [Value("|"),
+                     Value("python"),
+                     "lib/codon-align.py",
+                     Value("-"),
+                     "data/{}.hmm".format(gene)],
+                    "python $SOURCES ${TARGETS[0]} 2> ${TARGETS[1]}",
+                    wrap=True)
+
     SrunCommand(["scratch/aligned/{}/consensus.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa.log".format(gene)],
-                ["scratch/unaligned/{}/consensus.fa".format(gene)],
-                "mafft --op 2 --thread $CPUS --auto $SOURCES 1> ${TARGETS[0]} 2> ${TARGETS[1]}",
-                wrap=True)
+                ["lib/codon-align.py",
+                 "scratch/unaligned/{}/consensus.fa".format(gene),
+                 "data/{}.hmm".format(gene)],
+                "python $SOURCES $SOURCES ${TARGETS[0]} 2> ${TARGETS[1]}")
+
+    # concatenate wgs
+
 
 # trees
 
