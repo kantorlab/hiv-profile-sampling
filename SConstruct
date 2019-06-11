@@ -50,9 +50,16 @@ for gene in sum(genes.values(), []):
                      "{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene)],
                     "python $SOURCES $TARGETS".format(gene, dataset))
 
+    for i in range(nsamples):
+        env.Command(["scratch/unaligned/{}/sample.{}.fa".format(gene, i)],
+                    ["lib/select-sample.py",
+                     Value(i)] + \
+                    ["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset) for dataset in datasets],
+                    "python $SOURCES > $TARGET")
+
     # consensus
 
-    SrunCommand(["scratch/unaligned/{}/consensus.fa".format(gene)],
+    env.Command(["scratch/unaligned/{}/consensus.fa".format(gene)],
                 ["lib/consensus.py"] + ["{}/MC{}/{}.codons.txt".format(data_dir, dataset, gene)
                                         for dataset in datasets],
                 "python $SOURCES $TARGETS")
@@ -63,15 +70,9 @@ for gene in sum(genes.values(), []):
         SrunCommand(["scratch/aligned/{}/sample.{}.aa.fa".format(gene, i),
                      "scratch/aligned/{}/sample.{}.fa".format(gene, i),
                      "scratch/aligned/{}/sample.{}.fa.log".format(gene, i)],
-                    ["lib/select-sample.py",
-                     Value(i)] + \
-                    ["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset) for dataset in datasets] + \
-                    [Value("|"),
-                     Value("python"),
-                     "lib/codon-align.py",
-                     Value("-")],
-                    "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}",
-                    wrap=True)
+                    ["lib/codon-align.py",
+                     "scratch/unaligned/{}/sample.{}.fa".format(gene, i)],
+                    "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
     SrunCommand(["scratch/aligned/{}/consensus.aa.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa".format(gene),
@@ -80,34 +81,48 @@ for gene in sum(genes.values(), []):
                  "scratch/unaligned/{}/consensus.fa".format(gene)],
                 "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
-    # concatenate wgs
+# concatenate wgs alignments
 
+for i in range(nsamples):
+    env.Command(["scratch/aligned/wgs/sample.{}.fa".format(i)],
+                ["lib/concat.py"] + \
+                ["scratch/aligned/{}/sample.{}.fa".format(gene, i) for gene in genes["wgs"]],
+                "python $SOURCES > $TARGET")
+
+env.Command(["scratch/aligned/wgs/consensus.fa"],
+            ["lib/concat.py"] + \
+            ["scratch/aligned/{}/consensus.fa".format(gene) for gene in genes["wgs"]],
+            "python $SOURCES > $TARGET")
 
 # trees
 
-#for gene in ["prrt", "int", "wgs"]:
-#    SrunCommand(["scratch/trees/{}/RAxML_info.consensus".format(gene),
-#                 "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
-#                 "scratch/trees/{}/RAxML_bipartitions.consensus".format(gene),
-#                 "scratch/trees/{}/RAxML_bipartitionsBranchLabels.consensus".format(gene),
-#                 "scratch/trees/{}/RAxML_bootstrap.consensus".format(gene)],
-#                ["lib/raxml.sh",
-#                 "scratch/aligned/{}/consensus.fa".format(gene),
-#                 Value(100),
-#                 Value("GTRGAMMA")],
-#                "bash $SOURCES $CPUS scratch/trees/{0} consensus &> logs/raxml/{0}/consensus.log".format(gene),
-#                cpus=20)
-#    for i in range(nsamples):
-#        SrunCommand(["scratch/trees/{}/RAxML_info.sample.{}".format(gene, i),
-#                     "scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i),
-#                     "scratch/trees/{}/RAxML_bipartitions.sample.{}".format(gene, i),
-#                     "scratch/trees/{}/RAxML_bipartitionsBranchLabels.sample.{}".format(gene, i),
-#                     "scratch/trees/{}/RAxML_bootstrap.sample.{}".format(gene, i)],
-#                    ["lib/raxml.sh",
-#                     "scratch/aligned/{}/sample.{}.fa".format(gene, i),
-#                     Value(100),
-#                     Value("GTRGAMMA")],
-#                    "bash $SOURCES $CPUS scratch/trees/{0} sample.{1} &> logs/raxml/{0}/sample.{1}.log".format(gene, i),
-#                    cpus=20)
+for gene in ["prrt", "int", "env", "wgs"]:
+
+    for i in range(nsamples):
+        SrunCommand(["scratch/trees/{}/sample.{}.log".format(gene, i),
+                     "scratch/trees/{}/RAxML_info.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bipartitions.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bipartitionsBranchLabels.sample.{}".format(gene, i),
+                     "scratch/trees/{}/RAxML_bootstrap.sample.{}".format(gene, i)],
+                    ["lib/raxml.sh",
+                     "scratch/aligned/{}/sample.{}.fa".format(gene, i),
+                     Value(100),
+                     Value("GTRGAMMA")],
+                    "bash $SOURCES $CPUS scratch/trees/{0} sample.{1} > $TARGET".format(gene, i),
+                    cpus=20)
+
+    SrunCommand(["scratch/trees/{}/consensus.log".format(gene),
+                 "scratch/trees/{}/RAxML_info.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bipartitions.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bipartitionsBranchLabels.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bootstrap.consensus".format(gene)],
+                ["lib/raxml.sh",
+                 "scratch/aligned/{}/consensus.fa".format(gene),
+                 Value(100),
+                 Value("GTRGAMMA")],
+                "bash $SOURCES $CPUS scratch/trees/{0} consensus > $TARGET".format(gene),
+                cpus=20)
 
 # vim: syntax=python expandtab sw=4 ts=4
