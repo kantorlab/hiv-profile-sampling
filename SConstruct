@@ -110,7 +110,9 @@ env.Command(["scratch/aligned/wgs/consensus.fa"],
 
 # trees
 
-for gene in ["prrt", "int", "env", "wgs"]:
+genes = ["prrt", "int", "env", "wgs"]
+
+for gene in genes:
 
     for dataset in datasets:
         SrunCommand(["scratch/trees/{}/sample.MC{}.log".format(gene, dataset),
@@ -140,6 +142,10 @@ for gene in ["prrt", "int", "env", "wgs"]:
                     "bash $SOURCES $CPUS scratch/trees/{0} sample.{1} > $TARGET".format(gene, i),
                     cpus=20)
 
+    env.Command(["scratch/trees/{}/RAxML_bestTree.samples".format(gene)],
+                ["scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i) for i in range(nsamples)],
+                "cat $SOURCES > $TARGET")
+
     SrunCommand(["scratch/trees/{}/consensus.log".format(gene),
                  "scratch/trees/{}/RAxML_info.consensus".format(gene),
                  "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
@@ -152,5 +158,13 @@ for gene in ["prrt", "int", "env", "wgs"]:
                  Value("GTRGAMMA")],
                 "bash $SOURCES $CPUS scratch/trees/{0} consensus > $TARGET".format(gene),
                 cpus=20)
+
+# figures
+
+env.Command(["manuscript/Figure3.pdf"],
+            ["lib/Figure3.R"] + \
+            ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes] + \
+            ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
+            "Rscript $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4
