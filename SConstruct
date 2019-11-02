@@ -159,12 +159,30 @@ for gene in genes:
                 "bash $SOURCES $CPUS scratch/trees/{0} consensus > $TARGET".format(gene),
                 cpus=20)
 
+SrunCommand(["scratch/trees/distance.RData"],
+            ["lib/tree-distance.R"] + \
+            ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
+            ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
+            "Rscript $SOURCES $TARGET")
+
+SrunCommand(["scratch/trees/mds.RData"],
+            ["lib/tree-mds.R",
+             "scratch/trees/distance.RData"],
+            "Rscript $SOURCES $TARGET")
+
 # figures
+
+env.Command(["manuscript/Figure2.pdf",
+             "manuscript/Figure2.log"],
+            ["lib/Figure2.R",
+             "scratch/trees/distance.RData",
+             "scratch/trees/mds.RData"],
+            "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
 
 env.Command(["manuscript/Figure3.pdf"],
             ["lib/Figure3.R"] + \
-            ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes] + \
-            ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
+            ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
+            ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4
