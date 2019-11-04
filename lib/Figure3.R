@@ -46,11 +46,12 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
                Consensus=Consensus,
                Tips=factor(Tips, levels=c("FALSE", "TRUE"), labels=c("All Branches", "Tip Branches")))
 
-g <- ggplot(data, aes(x=Gene, y=BranchLengths)) +
-     geom_violin() +
-     geom_point(data=filter(data, Consensus==TRUE), colour="red") +
+g <- ggplot(data, aes(x=Gene, y=BranchLengths, fill=Gene)) +
+     geom_violin(colour="white") +
+     geom_point(data=filter(data, Consensus==TRUE), colour="black") +
      expand_limits(y=0) +
      labs(y="Sum of Branch Lengths in Tree") +
-     facet_grid(. ~ Tips)
+     facet_grid(. ~ Tips) +
+     theme(legend.position="none")
 
 ggsave(outfile, g, width=6, height=6, units="in")
