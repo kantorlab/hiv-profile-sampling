@@ -1,25 +1,41 @@
 library(tidyverse)
 
 args <- commandArgs(trailingOnly=TRUE)
-distfile <- args[1]
-mdsfile  <- args[2]
-outfile  <- args[3]
+mdsfiles <- args[1:(length(args)-1)]
+outfile  <- args[length(args)]
 
-load(distfile, verbose=TRUE)
-load(mdsfile, verbose=TRUE)
+Gene <- c()
+Consensus <- c()
+X <- c()
+Y <- c()
 
-print("Percent of variance explained by MDS axes:")
-print(round(mds$eig*100/sum(mds$eig), 1))
+for (mdsfile in mdsfiles)
+{
+    load(mdsfile, verbose=TRUE)
 
-data <- tibble(Gene=factor(genes, levels=c("prrt", "int", "env", "wgs")),
-               Consensus=factor(consensus),
-               X=mds$points[,1],
-               Y=mds$points[,2])
+    print(paste0("Percent of variance explained by MDS axes for ", genes[1], ":"))
+    print(round(mds$eig*100/sum(mds$eig), 1))
 
-g <- ggplot(data, aes(x=X, y=Y, colour=Gene, shape=Consensus)) +
-     geom_point(alpha=0.3) +
-     scale_shape_manual(values=c(3, 16)) +
-     labs(x="", y="") +
-     theme(legend.position="bottom")
+    Gene <- c(Gene, genes)
+    Consensus <- c(Consensus, consensus)
+    X <- c(X, mds$points[,1])
+    Y <- c(Y, mds$points[,2])
+}
 
-ggsave(outfile, g, width=6, height=6, units="in")
+data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
+               Consensus=Consensus,
+               X=X,
+               Y=Y) %>%
+        arrange(Consensus)
+
+g <- ggplot(data, aes(x=X, y=Y, colour=Gene)) +
+     geom_point(shape=3) +
+     geom_point(data=filter(data, Consensus==TRUE), shape=16, colour="black") +
+     facet_grid(. ~ Gene) +
+     xlim(-0.06, 0.06) +
+     ylim(-0.06, 0.06) +
+     labs(x="MDS Axis 1", y="MDS Axis 2") +
+     theme(legend.position="none",
+           axis.text=element_text(size=6))
+
+ggsave(outfile, g, width=12, height=3.5, units="in")

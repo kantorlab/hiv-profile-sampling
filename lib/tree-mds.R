@@ -9,5 +9,5 @@ load(distfile, verbose=TRUE)
 # Compute multi-dimensional scaling.
 mds <- cmdscale(distance, k=2, eig=TRUE)
 
-save(mds, file=outfile)
+save(genes, consensus, mds, file=outfile)
 

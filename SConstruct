@@ -159,6 +159,8 @@ for gene in genes:
                 "bash $SOURCES $CPUS scratch/trees/{0} consensus > $TARGET".format(gene),
                 cpus=20)
 
+# compute all pairwise tree distances
+
 SrunCommand(["scratch/trees/distance.RData"],
             ["lib/tree-distance.R"] + \
             ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
@@ -170,13 +172,27 @@ SrunCommand(["scratch/trees/mds.RData"],
              "scratch/trees/distance.RData"],
             "Rscript $SOURCES $TARGET")
 
+# compute pairwise tree distances within genes
+
+for gene in genes:
+
+    SrunCommand(["scratch/trees/distance.{}.RData".format(gene)],
+                ["lib/tree-distance.R",
+                 "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bestTree.samples".format(gene)],
+                "Rscript $SOURCES $TARGET")
+
+    SrunCommand(["scratch/trees/mds.{}.RData".format(gene)],
+                ["lib/tree-mds.R",
+                 "scratch/trees/distance.{}.RData".format(gene)],
+                "Rscript $SOURCES $TARGET")
+
 # figures
 
 env.Command(["manuscript/Figure2.pdf",
              "manuscript/Figure2.log"],
-            ["lib/Figure2.R",
-             "scratch/trees/distance.RData",
-             "scratch/trees/mds.RData"],
+            ["lib/Figure2.R"] + \
+            ["scratch/trees/mds.{}.RData".format(gene) for gene in genes],
             "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
 
 env.Command(["manuscript/Figure3.pdf"],
@@ -184,5 +200,11 @@ env.Command(["manuscript/Figure3.pdf"],
             ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
             ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
+
+env.Command(["manuscript/FigureS1.pdf",
+             "manuscript/FigureS1.log"],
+            ["lib/FigureS1.R",
+             "scratch/trees/mds.RData"],
+            "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
 
 # vim: syntax=python expandtab sw=4 ts=4
