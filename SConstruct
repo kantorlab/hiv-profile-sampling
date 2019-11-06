@@ -211,6 +211,14 @@ for name in names:
                      Value(80), Value(80), Value(0.045), Value(0), Value("ambiguity")],
                     "java -jar $SOURCES > $TARGET")
 
+for gene in genes:
+    env.Command(["scratch/clusters/{}/support.csv".format(gene)],
+                ["lib/cluster-support.py",
+                 "scratch/clusters/{}/consensus.fa_consensus_clusterPicks.fas".format(gene)] + \
+                ["scratch/clusters/{0}/sample.{1}.fa_sample.{1}_clusterPicks.fas".format(gene, i)
+                 for i in range(nsamples)],
+                "python $SOURCES $TARGETS")
+
 # figures
 
 env.Command(["manuscript/Figure2.pdf",
