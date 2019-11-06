@@ -187,6 +187,30 @@ for gene in genes:
                  "scratch/trees/distance.{}.RData".format(gene)],
                 "Rscript $SOURCES $TARGET")
 
+# clusters
+
+names = ["consensus"] + ["sample.{}".format(i) for i in range(nsamples)]
+for name in names:
+   for gene in genes:
+        # copy local files for ClusterPicker
+        env.Command("scratch/clusters/{}/{}.fa".format(gene, name),
+                    "scratch/aligned/{}/{}.fa".format(gene, name),
+                    "cp $SOURCE $TARGET")
+        env.Command("scratch/clusters/{}/{}.nwk".format(gene, name),
+                    "scratch/trees/{}/RAxML_bipartitions.{}".format(gene, name),
+                    "cp $SOURCE $TARGET")
+        # run ClusterPicker
+        env.Command(["scratch/clusters/{}/{}.log".format(gene, name),
+                     "scratch/clusters/{}/{}_clusterPicks.nwk".format(gene, name),
+                     "scratch/clusters/{}/{}_clusterPicks.nwk.figTree".format(gene, name),
+                     "scratch/clusters/{}/{}_clusterPicks_log.txt".format(gene, name),
+                     "scratch/clusters/{0}/{1}.fa_{1}_clusterPicks.fas".format(gene, name)],
+                    ["lib/ClusterPicker_1.2.3.jar",
+                     "scratch/clusters/{}/{}.fa".format(gene, name),
+                     "scratch/clusters/{}/{}.nwk".format(gene, name),
+                     Value(80), Value(80), Value(0.045), Value(0), Value("ambiguity")],
+                    "java -jar $SOURCES > $TARGET")
+
 # figures
 
 env.Command(["manuscript/Figure2.pdf",
