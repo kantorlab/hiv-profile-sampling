@@ -233,10 +233,26 @@ env.Command(["manuscript/Figure3.pdf"],
             ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
+env.Command(["manuscript/Figure4.pdf"],
+            ["lib/Figure4.R"] + \
+            list(zip(["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
+                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
+            "Rscript $SOURCES $TARGET")
+
 env.Command(["manuscript/FigureS1.pdf",
              "manuscript/FigureS1.log"],
             ["lib/FigureS1.R",
              "scratch/trees/mds.RData"],
             "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
+
+env.Command(["manuscript/FigureS2.pdf"],
+            ["lib/FigureS2.R"] + \
+            ["scratch/trees/{}/RAxML_bootstrap.consensus".format(gene) for gene in genes],
+            "Rscript $SOURCES $TARGET")
+
+env.Command(["manuscript/FigureS3.pdf"],
+            ["lib/FigureS2.R"] + \
+            ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
+            "Rscript $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4

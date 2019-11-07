@@ -24,23 +24,27 @@ def read_fa_headers(filename):
 
 support = {}
 
-def subsupport(cluster):
-    """
-    Recursive function to add support for all subclusters.
-    """
-    cluster = cluster.split(",")
-    if len(cluster) > 2:
-        for i in range(len(cluster)):
-            subcluster = ",".join(cluster[:i] + cluster[i+1:])
-            support[subcluster] = support.get(subcluster, 0) + 1
-            subsupport(subcluster)
-
 for clusters in map(read_fa_headers, samplefiles):
     for cluster in clusters:
         support[cluster] = support.get(cluster, 0) + 1
-        subsupport(cluster)
 
 consensus = read_fa_headers(consensusfile)
+
+# Add any clusters in the consensus tree that are missing from the samples,
+# at 0 support.
+for cluster in consensus:
+    support[cluster] = support.get(cluster, 0)
+
+# Prune redundant clusters
+clusters = list(support)
+while clusters:
+    cluster = clusters.pop(0).split(",")
+    if len(cluster) > 2:
+        for i in range(len(cluster)):
+            subcluster = ",".join(cluster[:i] + cluster[i+1:])
+            if subcluster in support:
+                support.pop(subcluster)
+            clusters.append(subcluster)
 
 with open(outfile, "w") as f:
     print("cluster,N,support,consensus", file=f)
