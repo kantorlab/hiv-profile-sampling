@@ -159,6 +159,15 @@ for gene in genes:
                 "bash $SOURCES $CPUS scratch/trees/{0} consensus > $TARGET".format(gene),
                 cpus=20)
 
+# compute all pairwise intra-patient genetic distances
+
+for gene in genes:
+    for dataset in datasets:
+        SrunCommand(["scratch/aligned/{}/distances.MC{}.csv".format(gene, dataset)],
+                    ["lib/genetic-distance.py",
+                     "scratch/aligned/{}/sample.MC{}.fa".format(gene, dataset)],
+                    "python $SOURCES $TARGET")
+
 # compute all pairwise tree distances
 
 SrunCommand(["scratch/trees/distance.RData"],
@@ -220,6 +229,11 @@ for gene in genes:
                 "python $SOURCES $TARGETS")
 
 # figures
+
+env.Command(["manuscript/Figure1.pdf"],
+            ["lib/Figure1.R"] + \
+            ["scratch/aligned/{}/distances.MC{}.csv".format(gene, dataset) for gene in genes for dataset in datasets],
+            "Rscript $SOURCES $TARGET")
 
 env.Command(["manuscript/Figure2.pdf",
              "manuscript/Figure2.log"],
