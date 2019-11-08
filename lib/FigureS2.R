@@ -2,8 +2,6 @@ library(ape)
 library(tidyverse)
 library(ggtree)
 
-set.seed(0)
-
 args <- commandArgs(trailingOnly=TRUE)
 treefiles <- args[1:(length(args)-1)]
 outfile <- args[length(args)]
@@ -21,9 +19,6 @@ for (treefile in treefiles)
 
     # Load tree
     trees <- read.tree(treefile)
-    if (length(trees) > 100) {
-        trees <- trees[sample.int(length(trees), size=100)]
-    }
 
     if (length(order) == 0) {
         tree <- ladderize(trees[[1]])
@@ -33,7 +28,7 @@ for (treefile in treefiles)
     }
 
     # Plot tree
-    plots[[gene]] <- ggdensitree(trees, alpha=0.1, tip.order=order) +
+    plots[[gene]] <- ggdensitree(trees, alpha=0.1*(100/length(trees)), tip.order=order) +
                      geom_tiplab(size=1.6)
 }
 

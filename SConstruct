@@ -146,6 +146,10 @@ for gene in genes:
                 ["scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i) for i in range(nsamples)],
                 "cat $SOURCES > $TARGET")
 
+    env.Command(["scratch/trees/{}/RAxML_bootstrap.samples".format(gene)],
+                ["scratch/trees/{}/RAxML_bestTree.samples".format(gene)],
+                "sed 's/:[\.0-9]*//g' $SOURCE > $TARGET")
+
     SrunCommand(["scratch/trees/{}/consensus.log".format(gene),
                  "scratch/trees/{}/RAxML_info.consensus".format(gene),
                  "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
@@ -266,7 +270,7 @@ env.Command(["manuscript/FigureS2.pdf"],
 
 env.Command(["manuscript/FigureS3.pdf"],
             ["lib/FigureS2.R"] + \
-            ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
+            ["scratch/trees/{}/RAxML_bootstrap.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4
