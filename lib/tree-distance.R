@@ -7,7 +7,7 @@ outfile <- args[length(args)]
 
 trees <- c()
 genes <- c()
-consensus <- c()
+names <- c()
 
 for (filename in filenames) 
 {
@@ -26,16 +26,20 @@ for (filename in filenames)
     # Append gene and consensus values.
     if (endsWith(filename, "consensus")) {
         n <- 1
+        names <- c(names, "NGS consensus")
+    } else if (endsWith(filename, "sanger")) {
+        n <- 1
+        names <- c(names, "Sanger consensus")
     } else {
         n <- length(t)
+        names <- c(names, rep("NGS profile-sampled", n))
     }
     genes <- c(genes, rep(gene, n))
-    consensus <- c(consensus, rep(endsWith(filename, "consensus"), n))
 }
 .compressTipLabel(trees)
 
 # Compute geodesic distance.
 distance <- dist.multiPhylo(trees, force.multi2di=TRUE)
 
-save(trees, genes, consensus, distance, file=outfile)
+save(trees, genes, names, distance, file=outfile)
 

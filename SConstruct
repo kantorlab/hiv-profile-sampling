@@ -108,6 +108,15 @@ env.Command(["scratch/aligned/wgs/consensus.fa"],
             ["scratch/aligned/{}/consensus.fa".format(gene) for gene in genes["wgs"]],
             "python $SOURCES > $TARGET")
 
+# slice Sanger alignment into genes
+
+env.Command(["scratch/aligned/prrt/sanger.fa",
+             "scratch/aligned/int/sanger.fa",
+             "scratch/aligned/env/sanger.fa",
+             "scratch/aligned/wgs/sanger.fa"],
+            ["lib/sanger.py",
+             "{}/sanger.genecutter.fa".format(data_dir)])
+
 # trees
 
 genes = ["prrt", "int", "env", "wgs"]
@@ -150,18 +159,19 @@ for gene in genes:
                 ["scratch/trees/{}/RAxML_bestTree.samples".format(gene)],
                 "sed 's/:[\.0-9]*//g' $SOURCE > $TARGET")
 
-    SrunCommand(["scratch/trees/{}/consensus.log".format(gene),
-                 "scratch/trees/{}/RAxML_info.consensus".format(gene),
-                 "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
-                 "scratch/trees/{}/RAxML_bipartitions.consensus".format(gene),
-                 "scratch/trees/{}/RAxML_bipartitionsBranchLabels.consensus".format(gene),
-                 "scratch/trees/{}/RAxML_bootstrap.consensus".format(gene)],
-                ["lib/raxml.sh",
-                 "scratch/aligned/{}/consensus.fa".format(gene),
-                 Value(100),
-                 Value("GTRGAMMA")],
-                "bash $SOURCES $CPUS scratch/trees/{0} consensus > $TARGET".format(gene),
-                cpus=20)
+    for name in ("consensus", "sanger"):
+        SrunCommand(["scratch/trees/{}/{}.log".format(gene, name),
+                     "scratch/trees/{}/RAxML_info.{}".format(gene, name),
+                     "scratch/trees/{}/RAxML_bestTree.{}".format(gene, name),
+                     "scratch/trees/{}/RAxML_bipartitions.{}".format(gene, name),
+                     "scratch/trees/{}/RAxML_bipartitionsBranchLabels.{}".format(gene, name),
+                     "scratch/trees/{}/RAxML_bootstrap.{}".format(gene, name)],
+                    ["lib/raxml.sh",
+                     "scratch/aligned/{}/{}.fa".format(gene, name),
+                     Value(100),
+                     Value("GTRGAMMA")],
+                    "bash $SOURCES $CPUS scratch/trees/{} {} > $TARGET".format(gene, name),
+                    cpus=20)
 
 # compute all pairwise intra-patient genetic distances
 
@@ -177,6 +187,7 @@ for gene in genes:
 SrunCommand(["scratch/trees/distance.RData"],
             ["lib/tree-distance.R"] + \
             ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
+            ["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes] + \
             ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
@@ -192,6 +203,7 @@ for gene in genes:
     SrunCommand(["scratch/trees/distance.{}.RData".format(gene)],
                 ["lib/tree-distance.R",
                  "scratch/trees/{}/RAxML_bestTree.consensus".format(gene),
+                 "scratch/trees/{}/RAxML_bestTree.sanger".format(gene),
                  "scratch/trees/{}/RAxML_bestTree.samples".format(gene)],
                 "Rscript $SOURCES $TARGET")
 
@@ -202,7 +214,7 @@ for gene in genes:
 
 # clusters
 
-names = ["consensus"] + ["sample.{}".format(i) for i in range(nsamples)]
+names = ["consensus", "sanger"] + ["sample.{}".format(i) for i in range(nsamples)]
 for name in names:
    for gene in genes:
         # copy local files for ClusterPicker
@@ -227,7 +239,8 @@ for name in names:
 for gene in genes:
     env.Command(["scratch/clusters/{}/support.csv".format(gene)],
                 ["lib/cluster-support.py",
-                 "scratch/clusters/{}/consensus.fa_consensus_clusterPicks.fas".format(gene)] + \
+                 "scratch/clusters/{}/consensus.fa_consensus_clusterPicks.fas".format(gene),
+                 "scratch/clusters/{}/sanger.fa_sanger_clusterPicks.fas".format(gene)] + \
                 ["scratch/clusters/{0}/sample.{1}.fa_sample.{1}_clusterPicks.fas".format(gene, i)
                  for i in range(nsamples)],
                 "python $SOURCES $TARGETS")
@@ -248,6 +261,7 @@ env.Command(["manuscript/Figure2.pdf",
 env.Command(["manuscript/Figure3.pdf"],
             ["lib/Figure3.R"] + \
             ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
+            ["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes] + \
             ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 

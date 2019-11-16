@@ -5,7 +5,7 @@ mdsfiles <- args[1:(length(args)-1)]
 outfile  <- args[length(args)]
 
 Gene <- c()
-Consensus <- c()
+Name <- c()
 X <- c()
 Y <- c()
 
@@ -17,20 +17,20 @@ for (mdsfile in mdsfiles)
     print(round(mds$eig*100/sum(mds$eig), 1))
 
     Gene <- c(Gene, genes)
-    Consensus <- c(Consensus, consensus)
+    Name <- c(Name, names)
     X <- c(X, mds$points[,1])
     Y <- c(Y, mds$points[,2])
 }
 
 data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
-               Consensus=Consensus,
+               Name=Name,
                X=X,
                Y=Y) %>%
-        arrange(Consensus)
+        arrange(Name)
 
-g <- ggplot(data, aes(x=X, y=Y, colour=Gene)) +
-     geom_point(shape=3) +
-     geom_point(data=filter(data, Consensus==TRUE), shape=16, colour="black") +
+g <- ggplot(data, aes(x=X, y=Y, colour=Gene, shape=Name)) +
+     geom_point(data=filter(data, Name=="NGS profile-sampled"), shape=3) +
+     geom_point(data=filter(data, Name!="NGS profile-sampled"), colour="black") +
      facet_grid(. ~ Gene) +
      xlim(-0.06, 0.06) +
      ylim(-0.06, 0.06) +
