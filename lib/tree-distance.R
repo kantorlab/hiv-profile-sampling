@@ -26,13 +26,13 @@ for (filename in filenames)
     # Append gene and consensus values.
     if (endsWith(filename, "consensus")) {
         n <- 1
-        names <- c(names, "NGS consensus")
+        names <- c(names, "NGS Consensus")
     } else if (endsWith(filename, "sanger")) {
         n <- 1
-        names <- c(names, "Sanger consensus")
+        names <- c(names, "Sanger Consensus")
     } else {
         n <- length(t)
-        names <- c(names, rep("NGS profile-sampled", n))
+        names <- c(names, rep(NA, n))
     }
     genes <- c(genes, rep(gene, n))
 }

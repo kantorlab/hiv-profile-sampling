@@ -28,14 +28,15 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
                Y=Y) %>%
         arrange(Name)
 
-g <- ggplot(data, aes(x=X, y=Y, colour=Gene, shape=Name)) +
-     geom_point(data=filter(data, Name=="NGS profile-sampled"), shape=3) +
-     geom_point(data=filter(data, Name!="NGS profile-sampled"), colour="black") +
+g <- ggplot(data, aes(x=X, y=Y)) +
+     geom_point(aes(color=Gene), data=filter(data,  is.na(Name)), shape=3, show.legend=FALSE) +
+     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), color="black") +
      facet_grid(. ~ Gene) +
      xlim(-0.06, 0.06) +
      ylim(-0.06, 0.06) +
      labs(x="MDS Axis 1", y="MDS Axis 2") +
-     theme(legend.position="none",
+     theme(legend.position="right",
+           legend.title=element_blank(),
            axis.text=element_text(size=6))
 
-ggsave(outfile, g, width=12, height=3.5, units="in")
+ggsave(outfile, g, width=12, height=3.2, units="in")
