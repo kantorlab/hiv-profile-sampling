@@ -3,7 +3,8 @@ from Bio import SeqIO
 from collections import defaultdict
 
 consensusfile = sys.argv[1]
-samplefiles   = sys.argv[2:-1]
+sangerfile    = sys.argv[2]
+samplefiles   = sys.argv[3:-1]
 outfile       = sys.argv[-1]
 
 N = len(samplefiles)
@@ -29,10 +30,13 @@ for clusters in map(read_fa_headers, samplefiles):
         support[cluster] = support.get(cluster, 0) + 1
 
 consensus = read_fa_headers(consensusfile)
+sanger    = read_fa_headers(sangerfile)
 
-# Add any clusters in the consensus tree that are missing from the samples,
-# at 0 support.
+# Add any clusters in the consensus/sanger trees that are missing from the
+# samples, at 0 support.
 for cluster in consensus:
+    support[cluster] = support.get(cluster, 0)
+for cluster in sanger:
     support[cluster] = support.get(cluster, 0)
 
 # Prune redundant clusters
@@ -47,11 +51,12 @@ while clusters:
             clusters.append(subcluster)
 
 with open(outfile, "w") as f:
-    print("cluster,N,support,consensus", file=f)
+    print("cluster,N,support,consensus,sanger", file=f)
     for cluster in sorted(support, key=support.get, reverse=True):
         print("\"{}\"".format(cluster),
               support[cluster],
               100.0*support[cluster]/N,
               int(cluster in consensus),
+              int(cluster in sanger),
               sep=",", file=f)
 

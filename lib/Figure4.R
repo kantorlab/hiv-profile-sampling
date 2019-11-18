@@ -1,6 +1,8 @@
 library(ape)
 library(tidyverse)
 library(ggtree)
+library(gridExtra)
+library(grid)
 
 args <- commandArgs(trailingOnly=TRUE)
 infiles <- args[1:(length(args)-1)]
@@ -38,6 +40,13 @@ for (i in seq(1, length(infiles), 2))
     treefile = infiles[i]
     clusterfile = infiles[i+1]
 
+    # Find tree name in filename path.
+    if (endsWith(treefile, "consensus")) {
+        name <- "consensus"
+    } else if (endsWith(treefile, "sanger")) {
+        name <- "sanger"
+    }
+
     # Find gene name in filename path.
     path <- str_split(treefile, "/")[[1]]
     gene <- path[length(path)-1]
@@ -47,7 +56,7 @@ for (i in seq(1, length(infiles), 2))
     tree <- root(read.tree(treefile), "MC50")
 
     # Load cluster support
-    support <- read_csv(clusterfile) %>% filter(consensus == 1)
+    support <- read_csv(clusterfile) %>% filter(get(name) == 1)
     support$tips <- lapply(support$cluster, function(x) strsplit(x, ",")[[1]])
     support$MRCA <- sapply(support$tips, function(x) getMRCA(tree, x))
     print(support)
@@ -57,7 +66,9 @@ for (i in seq(1, length(infiles), 2))
     g <- ggtree(tree) +
          geom_tiplab(size=2) +
          geom_treescale(y=-1) +
-         xlim_tree(1.1*xscale)
+         xlim_tree(1.1*xscale) +
+         ggtitle(gene) +
+         theme(plot.title=element_text(face="bold"))
     for (i in 1:nrow(support)) {
         cluster <- support$cluster[i]
         if (!(cluster %in% names(colors))) {
@@ -65,9 +76,14 @@ for (i in seq(1, length(infiles), 2))
         }
         g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=0.1*xscale, color=colors[[cluster]])
     }
-    plots[[gene]] <- g
+    plots[[paste0(name, ":", gene)]] <- g
 }
 
-pdf(outfile, width=18, height=6)
-multiplot(plotlist=plots, ncol=4, labels=genes)
+N <- length(plots) / 2
+
+pdf(outfile, width=18, height=12)
+grid.newpage()
+grid.draw(cbind(tableGrob(c("NGS\nConsensus", "Sanger\nConsensus"), theme=ttheme_minimal(base_size=16)),
+                arrangeGrob(grobs=plots, ncol=N, nrow=2),
+                size="last"))
 dev.off()
