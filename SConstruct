@@ -115,7 +115,8 @@ env.Command(["scratch/aligned/prrt/sanger.fa",
              "scratch/aligned/env/sanger.fa",
              "scratch/aligned/wgs/sanger.fa"],
             ["lib/sanger.py",
-             "{}/sanger.genecutter.fa".format(data_dir)])
+             "{}/sanger.genecutter.fa".format(data_dir)],
+            "python $SOURCES $TARGETS")
 
 # trees
 
