@@ -35,8 +35,11 @@ g <- ggplot(data, aes(x=X, y=Y)) +
      xlim(-0.06, 0.06) +
      ylim(-0.06, 0.06) +
      labs(x="MDS Axis 1", y="MDS Axis 2") +
-     theme(legend.position="right",
+     theme(legend.position="bottom",
            legend.title=element_blank(),
-           axis.text=element_text(size=6))
+           axis.text=element_text(size=6),
+	   axis.title=element_text(size=9),
+	   strip.text=element_text(size=11),
+	   legend.text=element_text(size=11))
 
-ggsave(outfile, g, width=12, height=3.2, units="in")
+ggsave(outfile, g, width=10, height=3.5, units="in")

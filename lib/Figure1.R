@@ -30,6 +30,11 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
                Dataset=factor(Dataset),
                Diversity=Diversity)
 
+# Print min/max ranges for each region
+print(data %>%
+      group_by(Gene) %>%
+      summarise(Min=min(Diversity), Max=max(Diversity)))
+
 # Order by ascending env diversity
 env <- filter(data, Gene=="env") %>% arrange(Diversity)
 data <- mutate(data, Dataset=factor(Dataset, levels=env$Dataset))

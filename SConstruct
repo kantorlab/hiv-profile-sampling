@@ -249,10 +249,10 @@ for gene in genes:
 
 # figures
 
-env.Command(["manuscript/Figure1.pdf"],
+env.Command(["manuscript/Figure1.pdf", "manuscript/Figure1.log"],
             ["lib/Figure1.R"] + \
             ["scratch/aligned/{}/distances.MC{}.csv".format(gene, dataset) for gene in genes for dataset in datasets],
-            "Rscript $SOURCES $TARGET")
+            "Rscript $SOURCES $TARGET > ${TARGETS[1]}")
 
 env.Command(["manuscript/Figure2.pdf",
              "manuscript/Figure2.log"],
