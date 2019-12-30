@@ -276,8 +276,8 @@ env.Command(["manuscript/Figure4.pdf"],
                      ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
             "Rscript $SOURCES $TARGET")
 
-env.Command(["manuscript/Figure5.pdf"],
-            ["lib/Figure5.R"] + \
+env.Command(["manuscript/Figure6.pdf"],
+            ["lib/Figure6.R"] + \
             ["scratch/clusters/{}/support.csv".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
