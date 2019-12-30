@@ -271,7 +271,11 @@ env.Command(["manuscript/Figure3.pdf"],
 env.Command(["manuscript/Figure4.pdf"],
             ["lib/Figure4.R"] + \
             list(zip(["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
-                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])) + \
+                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
+            "Rscript $SOURCES $TARGET")
+
+env.Command(["manuscript/Figure5.pdf"],
+            ["lib/Figure4.R"] + \
             list(zip(["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes],
                      ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
             "Rscript $SOURCES $TARGET")

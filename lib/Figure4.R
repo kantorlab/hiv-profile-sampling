@@ -1,8 +1,6 @@
 library(ape)
 library(tidyverse)
 library(ggtree)
-library(gridExtra)
-library(grid)
 
 args <- commandArgs(trailingOnly=TRUE)
 infiles <- args[1:(length(args)-1)]
@@ -67,7 +65,6 @@ for (i in seq(1, length(infiles), 2))
          geom_tiplab(size=2) +
          geom_treescale(y=-1) +
          xlim_tree(1.1*xscale) +
-         ggtitle(gene) +
          theme(plot.title=element_text(face="bold"))
     for (i in 1:nrow(support)) {
         cluster <- support$cluster[i]
@@ -76,14 +73,11 @@ for (i in seq(1, length(infiles), 2))
         }
         g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=0.1*xscale, color=colors[[cluster]])
     }
-    plots[[paste0(name, ":", gene)]] <- g
+    plots[[gene]] <- g
 }
 
 N <- length(plots) / 2
 
-pdf(outfile, width=18, height=12)
-grid.newpage()
-grid.draw(cbind(tableGrob(c("NGS\nConsensus", "Sanger\nConsensus"), theme=ttheme_minimal(base_size=16)),
-                arrangeGrob(grobs=plots, ncol=N, nrow=2),
-                size="last"))
+pdf(outfile, width=18, height=6)
+multiplot(plotlist=plots, ncol=4, labels=genes)
 dev.off()
