@@ -38,8 +38,8 @@ g <- ggplot(data, aes(x=X, y=Y)) +
      theme(legend.position="bottom",
            legend.title=element_blank(),
            axis.text=element_text(size=6),
-	   axis.title=element_text(size=9),
-	   strip.text=element_text(size=11),
-	   legend.text=element_text(size=11))
+           axis.title=element_text(size=9),
+           strip.text=element_text(size=11),
+           legend.text=element_text(size=11))
 
 ggsave(outfile, g, width=10, height=3.5, units="in")
