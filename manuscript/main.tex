@@ -48,11 +48,11 @@ $^5$ Department of Ecology and Evolutionary Biology, Yale University, New Haven,
 
 \section*{Background}
 
-Clinicians are generally interested in inferring transmission links between HIV-infected individuals to improve HIV treatment and prevention. In the absence of reliable patient contact histories, phylogenetic analysis of viral sequence data can be used to infer transmission clusters \parencite{leitner}, under the assumption that two individuals sharing a most recent common ancestor in a phylogeny are more likely to share a transmission link in the real, unobservable transmission network. The application of phylogenetic analysis and cluster inference techniques in public health interventions to disrupt transmission was delineated as one of the four key pillars for achieving the Department of Health and Human Services' recently-announced plan for ending the HIV epidemic in the US \parencite{fauci}.
+Clinicians are generally interested in inferring transmission links between HIV-infected individuals to inform and improve HIV treatment and prevention. In the absence of reliable patient contact histories, phylogenetic analysis of viral sequence data can be used to infer transmission clusters \parencite{leitner}, under the assumption that two individuals sharing a most recent common ancestor in a phylogeny are more likely to share a transmission link in the real, unobservable transmission network. The application of phylogenetic analysis and cluster inference techniques in public health interventions to disrupt transmission was delineated as one of the four key pillars for achieving the Department of Health and Human Services' recently-announced plan for ending the HIV epidemic in the US \parencite{fauci}.
 
 While historically the phylogenetic informativeness of the \emph{pol} region of the HIV genome was initially contested \parencite{hue, sturmer}, its use is now widespread in phylogenetic analysis and cluster inference, often due to the availability of \emph{pol} sequences from routine clinical genotyping by commercial Sanger sequencing. In a meta study of published studies on HIV cluster infereance, 98 out of 105 (93\%) analyzed the \emph{pol} region \cite{hassan}.
 
-The increasing availability of NGS technology has led to longer and deeper sequencing of HIV, and data sets that cover nearly the whole genome with thousands or more reads at each site. Recent evidence suggests improvements in both phylogenetic analysis and cluster inference from near-whole genome HIV sequences obtained with NGS. For example, Yebra \emph{et al.} \parencite{yebra} found that the accuracy of phylogenetic reconstruction and cluster inference on simulated sequences improved with longer genomic regions (with the best accuracy from a gag-pol-env concatenation). Novitsky \emph{et al.} \parencite{novitsky} similarly studied the effects on cluster inference of using longer genomic regions from real near-whole genome Sanger sequences, and found that the proportion of sequences in clusters increased with longer sequence regions.
+The increasing availability of NGS technology has led to longer and deeper sequencing of HIV, and data sets that cover nearly the whole genome with thousands or more reads at each site. Recent evidence suggests improvements in both phylogenetic analysis and cluster inference from near-whole genome HIV sequences obtained with NGS. For example, Yebra \emph{et al.} \parencite{yebra} found that the accuracy of phylogenetic reconstruction and cluster inference on simulated sequences improved with longer genomic regions (with the best accuracy from a \emph{gag}-\emph{pol}-\emph{env} concatenation). Novitsky \emph{et al.} \parencite{novitsky} similarly studied the effects on cluster inference of using longer genomic regions from real near-whole genome Sanger sequences, and found that the proportion of sequences in clusters increased with longer sequence regions.
 
 Most phylogenetic methods require a single fully resolved sequence for each individual included in the phylogeny. Accordingly, researchers often summarize the within-host variation present in NGS data sets with a consensus sequence. In the larger context of phylogenetic methods (e.g. beyond their application to HIV sequences), this consensus approach carries an underlying statistical assumption of \emph{low relative entropy} \parencite{guang}. In the context of HIV, tihs assumption is that the consensus sequence adequately captures the relevant information about the distribution of sequences that might be constructed given the within-host variation measured in deep sequencing through NGS. Some previous studies of HIV transmission dynamics have accounted for this variation with coalescent within-host evolutionary models \parencite{giardina, romero-severson}, but such models still assume a consensus sequence as the observed data.
 
@@ -90,25 +90,26 @@ Taken together, these results demonstrate that within-host diversity is associat
 
 \subsection*{Inferred clusters differ by sequencing method and genomic region}
 
-Finally, we examine the clusters that are detected in the NGS vs. Sanger consensus phylogenies, and across the four regions. The NGS consensus phylogeny detects 8 clusters in prrt, 9 in \emph{int}, 4 in \emph{env}, and 6 in wgs. Each cluster appears as a colored bar in the phylograms in Figure 4. We use the proportion of times a cluster appears across the 500 profile-sampled phylogenies as a measure of support for that cluster, and report it next to the colored bar. Some clusters are robustly detected across all regions, such as the cluster (MC25, MC26, MC52), which has support between 98\% and 100\%. Other clusters are detected at lower support, and are not detected consistently across regions. For example, cluster (MC14, MC59) only appears in the wgs phylogeny, and at 62\% support.  
+Finally, we examine the clusters that are detected in the NGS versus Sanger consensus phylogenies, and across the four regions. The NGS consensus phylogeny detects 8 clusters in prrt, 9 in \emph{int}, 4 in \emph{env}, and 6 in wgs. Each cluster appears as a colored bar in the phylograms in Figure 4. We use the proportion of times a cluster appears across the 500 profile-sampled phylogenies as a measure of support for that cluster, and report it next to the colored bar. Some clusters are robustly detected across all regions, such as the cluster (MC25, MC26, MC52), which has support between 98\% and 100\%. Other clusters are detected at lower support, and are not detected consistently across regions. For example, cluster (MC14, MC59) only appears in the \emph{int} and wgs phylogenies, and at 60\% to 62\% support.  
 
 The Sanger consensus phylogeny detects 8 clusters in prrt, 7 in \emph{int}, 6 in \emph{env}, and 7 in wgs (Figure 5). As with the NGS consensus phylogeny, the support and consistency of cluster detection varies across regions. Cluster detection is mostly consistent with the NGS consensus, except for the cluster (MC17, MC21), which only occurs in \emph{env} in the Sanger consensus, and has zero support from the profile samples. Three clusters are consistently detected across NGS and Sanger, and across all regions: (MC23, MC24); (MC25, MC26, MC52); and (MC27, MC28).
 
 \section*{Discussion}
 
-Because previous studies of the HIV epidemic have shown high intra-patient variation, 
-and because we estimate similar within-host diversity using HIV profiles of our NGS data,
+Our study provides new evidence on the utility of NGS HIV sequencing for phylogenetic analysis and cluster inference. The deeper sequencing provided by NGS can measure within-host diversity that is associated with variation in phylogenetic estimates. This variation is in turn associated with differences in cluster detection, which could have epidemiological consequences as public health officials increasingly look to cluster inference as a tool for informing and improving HIV prevention and treatment. Current approaches to HIV cluster inference almost exclusively use Sanger \emph{pol} consensus sequences, due to their availability from routine genotyping. In our results, this approach uncovers 8 clusters; however, only 3 of the 8 are robustly detected across regions and in both NGS and Sanger consensus sequences. 
 
-A limitation of our study is the small number of participants. The participants do have a dense temporal sampling, and comprise all newly HIV-diagnosed individuals in a six month period at the largest HIV center in Rhode Island, USA, who met the inclusion criteria. However, the overall size of the HIV epidemic in Rhode Island is much larger, estimated as 2,396 individuals in 2016 \parencite{ridoh}. In future work, we hope to apply the profile sampling method to larger NGS data sets, to assess if cluster inference from Sanger versus NGS data agrees or differs especially for clusters larger than three individuals, which was the largest cluster size in our current data set.
+In our comparison of cluster inference across genomic regions, we found that fewer clusters were detected overall in \emph{env} and wgs compared to prrt and \emph{int}. Prior studies of clustering from Sanger consensus sequences present mixed results on the prevalence of clustering across regions. Some studies have found concordant clustering across \emph{gag}-\emph{env} \parencite{han} and \emph{gag}-\emph{pol}-\emph{env} \parencite{english,kaye}, while others found fewer clusters in \emph{pol} than in \emph{env} \parencite{kapaata}, or fewer clusters in \emph{gag}-\emph{env} than in \emph{pol} \parencite{ndiaye}. The additional information available in NGS data, along with the cluster support measures provided by profile sampling, may help resolve these differences. In our results, for example, the cluster support measure establishes four clusters with robust support ($\geq$95\%) in only prrt and \emph{int}: (MC37, MC53); (MC17, MC20, MC21); (MC41, MC47, MC56); and (MC45, MC58).
+
+A limitation of our study is the small number of participants. The participants have a dense temporal sampling, and comprise all newly HIV-diagnosed individuals in a six month period at the largest HIV center in Rhode Island, USA, who met the inclusion criteria. The overall size of the HIV epidemic in Rhode Island is much larger, estimated as 2,396 individuals in 2016 \parencite{ridoh}, but NGS data for this population are not currently available beyond those presented in this study. In future work, however, we hope to apply the profile sampling method to larger NGS data sets, to assess if cluster inference from Sanger versus NGS data agrees or differs especially for clusters larger than three individuals, which was the largest cluster size in this study.
 
 Our construction of HIV profiles from NGS data is limited by the accuracy of the NGS assays themselves. The codon frequencies in the profiles may be biased measures of the true within-host diversity because of biases in PCR amplification during sample preparation. Sequencing protocols such as Primer ID \parencite{jabara} have been introduced to reduce and correct for these biases. Unfortunately, the Primer ID protocol supports only a limited region of the HIV genome, and has not yet been extended to support near-whole genome sequencing of HIV, but future work could study this limited region to determine if cluster inference changes with the implementation of a Primer ID protocol.
 
-The true HIV transmission network is unknown, but phylogenetic analysis and cluster inference are promising tools for aiding clinicians and public health officials \parencite{fauci}. Current phylogenetic approaches do not fully utilize the information on within-host diversity available in near-whole genome NGS data. As NGS data sets are increasingly available and more fully sample from the current HIV epidemic, 
+The true HIV transmission network is unknown, but phylogenetic analysis and cluster inference are promising tools for aiding clinicians and public health officials \parencite{fauci}. Current phylogenetic approaches do not fully utilize the information on within-host diversity available in near-whole genome NGS data. As NGS data sets are increasingly available and become more representative of the current HIV epidemic, the additional information they measure has the potential to improve the robustness of cluster inference.
 
 \printbibliography
 
 \begin{figure}[p!]
-	\caption{Intra-patient genetic diversity (defined as the average percent difference across all pairwise comparisons of the 500 profile-sampled nucleotide sequences for a patient) is highest in the env region for most individuals, and lies within the range of previously reported values.}
+	\caption{Intra-patient genetic diversity (defined as the average percent difference across all pairwise comparisons of the 500 profile-sampled nucleotide sequences for a patient) is highest in \emph{env} for most individuals, and lies within the range of previously reported values.}
 	\centering
 	\includegraphics[width=\linewidth]{Figure1}
 	\label{fig1}
@@ -124,7 +125,7 @@ The true HIV transmission network is unknown, but phylogenetic analysis and clus
 \begin{figure}[p!]
 	\caption{The total branch length in each of the profile-sampled phylogenies also varies. The phylogenies from consensus sequences (black dots) can lie at extreme values within these distribution, both when considering the lengths across all branches and the lengths across only the branches at the tips.}
 	\centering
-	\includegraphics[width=4in]{Figure3}
+	\includegraphics[width=3.25in]{Figure3}
 	\label{fig3}
 \end{figure}
 
@@ -135,20 +136,20 @@ The true HIV transmission network is unknown, but phylogenetic analysis and clus
 	\label{fig4}
 \end{figure}
 
-%\begin{figure}[p!]
-%	\caption{Clusters (vertical colored bars) inferred from the phylogenies of Sanger consensus sequences differ across genomic regions. The largest number of clusters was inferred from the int region, and the smallest number from the env region. Profile sampling provides a bootstrapped measure of cluster support (annotation to bars).}
-%	\centering
-%	\includegraphics{Figure5}
-%	\label{fig5}
-%\end{figure}
-%
-%\newpage
+\begin{figure}[p!]
+	\caption{Clusters (vertical colored bars) inferred from the phylogenies of Sanger consensus sequences differ across genomic regions. The largest number of clusters was inferred from the int region, and the smallest number from the env region. Profile sampling provides a bootstrapped measure of cluster support (annotation to bars).}
+	\centering
+	\includegraphics[width=\linewidth]{Figure5}
+	\label{fig5}
+\end{figure}
+
+\newpage
 
 \begin{figure}[p!]
 	\caption{Summary of clusters identified by Sanger versus NGS consensus sequences across genomic regions. Numeric values indicate bootstrapped cluster support from the profile sampling method.}
 	\centering
-	\includegraphics[width=4in]{Figure5}
-	\label{fig5}
+	\includegraphics[width=3.25in]{Figure6}
+	\label{fig6}
 \end{figure}
 
 \end{document}
