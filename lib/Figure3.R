@@ -57,6 +57,10 @@ g <- ggplot(data, aes(x=Gene, y=BranchLengths)) +
      labs(y="Sum of Branch Lengths in Tree") +
      facet_grid(. ~ Tips) +
      theme(legend.position="bottom",
-           legend.title=element_blank())
+           legend.title=element_blank(),
+           axis.text=element_text(size=6),
+           axis.title=element_text(size=9),
+           strip.text=element_text(size=11),
+           legend.text=element_text(size=11))
 
-ggsave(outfile, g, width=6, height=6, units="in")
+ggsave(outfile, g, width=5, height=5, units="in")

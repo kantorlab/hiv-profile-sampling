@@ -75,6 +75,10 @@ g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Cluster, label=Support)) +
      scale_fill_manual(values=unlist(colors, use.names=FALSE)) +
      facet_grid(. ~ Name) + 
      theme(legend.position="none",
-           panel.background=element_blank())
+           panel.background=element_blank(),
+           axis.text=element_text(size=6),
+           axis.title=element_text(size=9),
+           strip.text=element_text(size=11),
+           legend.text=element_text(size=11))
 
 ggsave(outfile, g, width=5, height=5, units="in")
