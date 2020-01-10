@@ -8,7 +8,7 @@ distfiles  <- args[2:(length(args)-1)]
 outfile    <- args[length(args)]
 
 samples <- read_csv(samplefile) %>%
-           filter(Included==1) %>%
+           filter(Included == 1 & Analyte == "PL" & abs(VLToEnrollDays) < 90) %>%
            mutate(Dataset=factor(MC)) %>%
            select("Dataset", "VL")
 
