@@ -21,18 +21,19 @@
 
 \section*{Robustness of phylogenetic analysis for detecting clusters of new HIV infections}
 
-August Guang$^1$, Mark Howison$^2$, Mia Coetzer$^3$, Lauren Ledingham$^3$, Matt D'Antuono$^3$,
-Philip A. Chan$^3$, Charles Lawrence$^4$, Casey W. Dunn$^5$, Rami Kantor$^3$
+August Guang$^{1,2}$, Mark Howison$^3$, Charles Lawrence$^4$, Casey W. Dunn$^5$, Rami Kantor$^6$
 
-$^1$ Computing and Information Services, Brown University, Providence, RI, USA
+$^1$ Center for Computational Biology of Human Disease, Brown University, Providence, RI, USA
 
-$^2$ Research Improving People's Lives, Providence, RI, USA
+$^2$ Center for Computation and Visualization, Brown University, Providence, RI, USA
 
-$^3$ Division of Infectious Diseases, The Alpert Medical School, Brown University, Providence, RI, USA
+$^3$ Research Improving People's Lives, Providence, RI, USA
 
 $^4$ Division of Applied Mathematics, Brown University, Providence, RI, USA
 
 $^5$ Department of Ecology and Evolutionary Biology, Yale University, New Haven, CT, USA
+
+$^6$ Division of Infectious Diseases, The Alpert Medical School, Brown University, Providence, RI, USA
 
 \doublespace
 \linenumbers
@@ -50,13 +51,13 @@ $^5$ Department of Ecology and Evolutionary Biology, Yale University, New Haven,
 
 Clinicians are generally interested in inferring transmission links between HIV-infected individuals to inform and improve HIV treatment and prevention. In the absence of reliable patient contact histories, phylogenetic analysis of viral sequence data can be used to infer transmission clusters \parencite{leitner}, under the assumption that two individuals sharing a most recent common ancestor in a phylogeny are more likely to share a transmission link in the real, unobservable transmission network. The application of phylogenetic analysis and cluster inference techniques in public health interventions to disrupt transmission was delineated as one of the four key pillars for achieving the Department of Health and Human Services' recently-announced plan for ending the HIV epidemic in the US \parencite{fauci}.
 
-While historically the phylogenetic informativeness of the \emph{pol} region of the HIV genome was initially contested \parencite{hue, sturmer}, its use is now widespread in phylogenetic analysis and cluster inference, often due to the availability of \emph{pol} sequences from routine clinical genotyping by commercial Sanger sequencing. In a meta study of published studies on HIV cluster infereance, 98 out of 105 (93\%) analyzed the \emph{pol} region \cite{hassan}.
+While historically the phylogenetic informativeness of the \emph{pol} region of the HIV genome was initially contested \parencite{hue, sturmer}, its use is now widespread in phylogenetic analysis and cluster inference, often due to the availability of \emph{pol} sequences from routine clinical genotyping by commercial Sanger sequencing. In a meta study of published studies on HIV cluster inference, 98 out of 105 (93\%) analyzed the \emph{pol} region \parencite{hassan}.
 
 The increasing availability of NGS technology has led to longer and deeper sequencing of HIV, and data sets that cover nearly the whole genome with thousands or more reads at each site. Recent evidence suggests improvements in both phylogenetic analysis and cluster inference from near-whole genome HIV sequences obtained with NGS. For example, Yebra \emph{et al.} \parencite{yebra} found that the accuracy of phylogenetic reconstruction and cluster inference on simulated sequences improved with longer genomic regions (with the best accuracy from a \emph{gag}-\emph{pol}-\emph{env} concatenation). Novitsky \emph{et al.} \parencite{novitsky} similarly studied the effects on cluster inference of using longer genomic regions from real near-whole genome Sanger sequences, and found that the proportion of sequences in clusters increased with longer sequence regions.
 
-Most phylogenetic methods require a single fully resolved sequence for each individual included in the phylogeny. Accordingly, researchers often summarize the within-host variation present in NGS data sets with a consensus sequence. In the larger context of phylogenetic methods (e.g. beyond their application to HIV sequences), this consensus approach carries an underlying statistical assumption of \emph{low relative entropy} \parencite{guang}. In the context of HIV, tihs assumption is that the consensus sequence adequately captures the relevant information about the distribution of sequences that might be constructed given the within-host variation measured in deep sequencing through NGS. Some previous studies of HIV transmission dynamics have accounted for this variation with coalescent within-host evolutionary models \parencite{giardina, romero-severson}, but such models still assume a consensus sequence as the observed data.
+While the advantages of longer sequences in inferring transmission have been demonstrated, the advantages of deeper sequencing have not yet been fully investigated. In part this is because researchers often rely on consensus sequences, since most phylogenetic methods require a single fully resolved sequence for each individual included in the phylogeny. Accordingly, researchers studying HIV transmission summarize the within-host HIV variation present in NGS data sets with a consensus sequence. In the larger context of phylogenetic methods (e.g. beyond their application to HIV sequences), this consensus approach carries an underlying statistical assumption of \emph{low relative entropy} \parencite{guang}. In the context of HIV, this assumption is that a consensus sequence can adequately capture all of the relevant information about within-host variation available in a deeply-sequenced NGS data set. Some previous studies of HIV transmission dynamics have accounted for this variation with coalescent within-host evolutionary models \parencite{giardina, romero-severson}, but such models still assume a consensus sequence as the observed data.
 
-In this study, we examine how well this assumption underlying the consensus approach holds on a data set comprising all newly HIV-diagnosed individual in the first six months of 2013 from the largest HIV center in Rhode Island, USA. We present a new analysis method called \emph{profile sampling} that uses the within-host variation in the NGS data to assess the robustness of the consensus approach for phylogenetic analysis and cluster inference.
+In this study, we examine how well this assumption underlying the consensus approach holds on an NGS data set comprising all newly HIV-diagnosed individual in the first six months of 2013 from the largest HIV center in Rhode Island, USA. We present a new approach called \emph{profile sampling} that uses the within-host variation in the NGS data to assess the robustness of the consensus approach for phylogenetic analysis and cluster inference.
 
 \section*{Methods}
 
@@ -68,9 +69,11 @@ We obtained near-whole genome viral sequences for the 37 participants using both
 
 \subsection*{Profile sampling}
 
-We introduce a new approach for incorporating within-host variation into phylogentic analysis, called \emph{profile sampling}. We start by aligning each individual's NGS reads using the hivmmer pipeline \parencite{howison}, which we extended to support near-whole genome HIV data and to perform codon-aware alignment within each gene (pending release as hivmmer version 0.3.0). Briefly, hivmmer performs quality control and error correction in overlapping regions of the read pairs using PEAR version 0.9.11 \parencite{zhang}, translates them into each possible reading frame, aligns them in amino acid space to all group M reference sequences from the Los Alamos National Lab HIV Database with the probabilistic multiple sequence aligner HMMER version 3.1b2 \parencite{eddy}, and produces a codon frequency table across the near-whole HIV genome, which we refer to as the individual's HIV \emph{profile}.
+We introduce a new approach for incorporating within-host variation into phylogentic analysis, called \emph{profile sampling}. We start by aligning each individual's NGS reads using the hivmmer pipeline \parencite{howison}, which we extended to support near-whole genome HIV data and to perform codon-aware alignment within each gene (pending release as hivmmer version 0.3.0). A key feature of this pipeline is its use of profile hidden Markov models (HMMs) to model and align collections of HIV sequences. Profile HMMs have been used in many kinds of biological sequence analysis and are particularly well-suited to modeling variation in populations of sequences \parencite{eddy2004}. Briefly, hivmmer performs quality control and error correction in overlapping regions of the read pairs using PEAR version 0.9.11 \parencite{zhang}, translates them into each possible reading frame, aligns them in amino acid space to profile HMMs of all group M reference sequences from the Los Alamos National Lab HIV Database with the profile HMM alignment tool HMMER version 3.1b2 \parencite{eddy2013}, and produces a codon frequency table across the near-whole HIV genome. We refer to this resulting codon frequency table as the individual's HIV \emph{profile}.
 
-We construct fully-resolved sequences by sampling codons at each site in the genome using the codon frequencies from the profile. The collection of sampled sequences captures the empirical distribution of within-host variation at the codon level. We sample 500 sequences from each individual's profile, then collate the sampled sequences into 500 profile-sampled data sets, each having one sampled sequence per individual. We perform phylogenetic inference on each of the 500 profile-sampled data sets by estimating a multiple sequence alignment with mafft version 7.313 \parencite{katoh} and a maximum-likelihood phylogeny with the GTRCAT model and 100 rapid bootstrap replicates using RAxML version 8.2.12 \parencite{stamatakis}. In addition to the 500 profile-sampled phylogenies, we infer two additional phylogenies from the NGS consensus sequences and Sanger consensus sequences. We perform cluster inference on these phylogenies using Cluster Picker \parencite{ragonnet-cronin} with thresholds of 80\% bootstrap support and 4.5\% genetic distance. Analysis source code is available from \url{https://github.com/kantorlab/hiv-profile-sampling}.
+We construct fully-resolved sequences by sampling codons at each site in the genome using the codon frequencies from the profile. The collection of sampled sequences captures the empirical distribution of within-host variation at the codon level. We sample 500 sequences from each individual's profile, then collate the sampled sequences into 500 profile-sampled data sets, each having one sampled sequence per individual. We construct the 500 full-resolved sequences in order to use existing phylogenetic methods, because there is currently no published method to our knowledge for inferring a phylogeny directly from the proflie representation of the individual's within-host variation.
+
+We perform phylogenetic inference on each of the 500 profile-sampled data sets by estimating a multiple sequence alignment with mafft version 7.313 \parencite{katoh} and a maximum-likelihood phylogeny with the GTRCAT model and 100 rapid bootstrap replicates using RAxML version 8.2.12 \parencite{stamatakis}. In addition to the 500 profile-sampled phylogenies, we infer two additional phylogenies from the NGS consensus sequences and Sanger consensus sequences with the same tools and parameters. We perform cluster inference on these phylogenies using Cluster Picker \parencite{ragonnet-cronin} with thresholds of 80\% bootstrap support and 4.5\% genetic distance. Analysis source code is available from \url{https://github.com/kantorlab/hiv-profile-sampling}.
 
 In addition to performing these analyses on the near-whole genome sequences (``wgs''), we also perform them on subsets of the sequences in three clinicially relevant regions: the protease and reverse transcriptase regions at the beginning of the \emph{pol} gene (``prrt''), the \emph{int} gene, and the \emph{env} gene. The prrt region and \emph{int} are routinely sequenced in clinical care to detect drug resistance mutations and inform clinical choices of anti-retroviral therapy. The \emph{env} region is... Rami, why is this routinely sequenced??
 
@@ -105,6 +108,10 @@ A limitation of our study is the small number of participants. The participants 
 Our construction of HIV profiles from NGS data is limited by the accuracy of the NGS assays themselves. The codon frequencies in the profiles may be biased measures of the true within-host diversity because of biases in PCR amplification during sample preparation. Sequencing protocols such as Primer ID \parencite{jabara} have been introduced to reduce and correct for these biases. Unfortunately, the Primer ID protocol supports only a limited region of the HIV genome, and has not yet been extended to support near-whole genome sequencing of HIV, but future work could study this limited region to determine if cluster inference changes with the implementation of a Primer ID protocol.
 
 The true HIV transmission network is unknown, but phylogenetic analysis and cluster inference are promising tools for aiding clinicians and public health officials \parencite{fauci}. Current phylogenetic approaches do not fully utilize the information on within-host diversity available in near-whole genome NGS data. As NGS data sets are increasingly available and become more representative of the current HIV epidemic, the additional information they measure has the potential to improve the robustness of cluster inference.
+
+\section*{Acknowledgments}
+
+Mia Coetzer, Lauren Ledingham, Matt D'Antuono, Philip A. Chan
 
 \printbibliography
 
@@ -146,7 +153,7 @@ The true HIV transmission network is unknown, but phylogenetic analysis and clus
 \newpage
 
 \begin{figure}[p!]
-	\caption{Summary of clusters identified by Sanger versus NGS consensus sequences across genomic regions. Numeric values indicate bootstrapped cluster support from the profile sampling method.}
+	\caption{Summary of clusters identified by Sanger versus NGS consensus sequences across genomic regions. Numeric values indicate bootstrapped cluster support from the profile sampling method. A blank cell indicates that the cluster was not detected in that consensus sequence and genomic region.}
 	\centering
 	\includegraphics[width=3.25in]{Figure6}
 	\label{fig6}
