@@ -51,16 +51,14 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
                Tips=factor(Tips, levels=c("FALSE", "TRUE"), labels=c("All Branches", "Tip Branches")))
 
 g <- ggplot(data, aes(x=Gene, y=BranchLengths)) +
-     geom_violin(aes(fill=Gene), colour="white", show.legend=FALSE) +
-     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), colour="black") +
+     geom_violin(color=NA, fill="gray", show.legend=FALSE) +
+     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3, colour="black") +
      expand_limits(y=0) +
      labs(y="Sum of Branch Lengths in Tree") +
      facet_grid(. ~ Tips) +
+     theme_minimal() +
      theme(legend.position="bottom",
            legend.title=element_blank(),
-           axis.text=element_text(size=6),
-           axis.title=element_text(size=9),
-           strip.text=element_text(size=11),
-           legend.text=element_text(size=11))
+	   panel.grid.major.x=element_blank())
 
-ggsave(outfile, g, width=5, height=5, units="in")
+ggsave(outfile, g, width=3.5, height=6.5, units="in")

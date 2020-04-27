@@ -40,10 +40,12 @@ env <- filter(data, Gene=="env") %>% arrange(Diversity)
 data <- mutate(data, Dataset=factor(Dataset, levels=env$Dataset))
 
 g <- ggplot(data, aes(x=Dataset, y=Diversity, colour=Gene)) +
-     geom_point() +
-     labs(x="Patient", y="Intra-patient Genetic Diversity") +
+     geom_point(size=2, shape=21, fill=NA) +
+     labs(x="Patient", y="Within-Host Diversity") +
      scale_y_continuous(labels=scales::percent_format(accuracy=1)) +
+     scale_colour_manual(values=c("black", "gray50", "red3", "#56B4E9")) +
+     theme_classic() +
      theme(legend.position="right",
-           axis.text.x=element_text(angle = 90))
+           axis.text.x=element_text(angle=90, vjust=0.5))
 
-ggsave(outfile, g, width=12, height=3.5, units="in")
+ggsave(outfile, g, width=6.5, height=2.5, units="in")
