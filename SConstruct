@@ -78,15 +78,17 @@ for gene in sum(genes.values(), []):
         SrunCommand(["scratch/aligned/{}/sample.{}.aa.fa".format(gene, i),
                      "scratch/aligned/{}/sample.{}.fa".format(gene, i),
                      "scratch/aligned/{}/sample.{}.fa.log".format(gene, i)],
-                    ["lib/codon-align.py",
-                     "scratch/unaligned/{}/sample.{}.fa".format(gene, i)],
+                    ["lib/codon-align-outgroup.py",
+                     "scratch/unaligned/{}/sample.{}.fa".format(gene, i),
+                     "data/outgroup.{}.fa".format(gene)],
                     "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
     SrunCommand(["scratch/aligned/{}/consensus.aa.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa".format(gene),
                  "scratch/aligned/{}/consensus.fa.log".format(gene)],
-                ["lib/codon-align.py",
-                 "scratch/unaligned/{}/consensus.fa".format(gene)],
+                ["lib/codon-align-outgroup.py",
+                 "scratch/unaligned/{}/consensus.fa".format(gene),
+                 "data/outgroup.{}.fa".format(gene)],
                 "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
 # concatenate wgs alignments
@@ -124,20 +126,6 @@ env.Command(["scratch/aligned/prrt/sanger.fa",
 genes = ["prrt", "int", "env", "wgs"]
 
 for gene in genes:
-
-    for dataset in datasets:
-        SrunCommand(["scratch/trees/{}/sample.MC{}.log".format(gene, dataset),
-                     "scratch/trees/{}/RAxML_info.sample.MC{}".format(gene, dataset),
-                     "scratch/trees/{}/RAxML_bestTree.sample.MC{}".format(gene, dataset),
-                     "scratch/trees/{}/RAxML_bipartitions.sample.MC{}".format(gene, dataset),
-                     "scratch/trees/{}/RAxML_bipartitionsBranchLabels.sample.MC{}".format(gene, dataset),
-                     "scratch/trees/{}/RAxML_bootstrap.sample.MC{}".format(gene, dataset)],
-                    ["lib/raxml.sh",
-                     "scratch/aligned/{}/sample.MC{}.fa".format(gene, dataset),
-                     Value(100),
-                     Value("GTRGAMMA")],
-                    "bash $SOURCES $CPUS scratch/trees/{0} sample.MC{1} > $TARGET".format(gene, dataset),
-                    cpus=20)
 
     for i in range(nsamples):
         SrunCommand(["scratch/trees/{}/sample.{}.log".format(gene, i),

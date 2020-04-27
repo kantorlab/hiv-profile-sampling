@@ -12,4 +12,4 @@ NAME=$6
 # create deterministic seed from alignment
 SEED=$(cat $FA | md5sum | grep -Po "\d" | tail -10 | tr -d "\n")
 
-raxmlHPC-PTHREADS-AVX -T $CPUS -s $FA -p $SEED -x $SEED -f a -N $N -m $MODEL -w $PWD/$OUTDIR -n $NAME
+raxmlHPC-PTHREADS-AVX -T $CPUS -s $FA -p $SEED -x $SEED -f a -N $N -m $MODEL -w $PWD/$OUTDIR -n $NAME -o outgroup
