@@ -231,7 +231,7 @@ for name in names:
                     ["lib/ClusterPicker_1.2.3.jar",
                      "scratch/clusters/{}/{}.fa".format(gene, name),
                      "scratch/clusters/{}/{}.nwk".format(gene, name),
-                     Value(80), Value(80), Value(0.045), Value(0), Value("ambiguity")],
+                     Value(99), Value(99), Value(1.0), Value(0), Value("ambiguity")],
                     "java -jar $SOURCES > $TARGET")
 
 for gene in genes:
