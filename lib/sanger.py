@@ -4,7 +4,7 @@ from Bio import Seq
 
 in_file, datasets, prrt_file, int_file, env_file, wgs_file = sys.argv[1:]
 
-datasets = frozenset("MC" + i for i in datasets.split(","))
+datasets = frozenset(["MC" + i for i in datasets.split(",")] + ["outgroup"])
 
 regions = {
     "prrt": (prrt_file, 2253, 3869),

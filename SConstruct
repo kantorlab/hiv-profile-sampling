@@ -64,6 +64,12 @@ for gene in sum(genes.values(), []):
                                         for dataset in datasets],
                 "python $SOURCES $TARGETS")
 
+    # sanger
+
+    env.Command(["scratch/unaligned/{}/sanger.fa".format(gene)],
+                ["{}/sanger.omm_macse.{}.fa".format(data_dir, gene)],
+                "sed -e 's/-//g' $SOURCE > $TARGET")
+
     # alignments
 
     for dataset in datasets:
@@ -91,6 +97,14 @@ for gene in sum(genes.values(), []):
                  "data/outgroup.{}.fa".format(gene)],
                 "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
+    SrunCommand(["scratch/aligned/{}/sanger.aa.fa".format(gene),
+                 "scratch/aligned/{}/sanger.fa".format(gene),
+                 "scratch/aligned/{}/sanger.fa.log".format(gene)],
+                ["lib/codon-align-outgroup-sanger.py",
+                 "scratch/unaligned/{}/sanger.fa".format(gene),
+                 "data/outgroup.{}.fa".format(gene)],
+                "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
+
 # concatenate wgs alignments
 
 for dataset in datasets:
@@ -110,16 +124,10 @@ env.Command(["scratch/aligned/wgs/consensus.fa"],
             ["scratch/aligned/{}/consensus.fa".format(gene) for gene in genes["wgs"]],
             "python $SOURCES > $TARGET")
 
-# slice Sanger alignment into genes
-
-env.Command(["scratch/aligned/prrt/sanger.fa",
-             "scratch/aligned/int/sanger.fa",
-             "scratch/aligned/env/sanger.fa",
-             "scratch/aligned/wgs/sanger.fa"],
-            ["lib/sanger.py",
-             "{}/sanger.genecutter.fa".format(data_dir),
-             Value(",".join(map(str, datasets)))],
-            "python $SOURCES $TARGETS")
+env.Command(["scratch/aligned/wgs/sanger.fa"],
+            ["lib/concat.py"] + \
+            ["scratch/aligned/{}/sanger.fa".format(gene) for gene in genes["wgs"]],
+            "python $SOURCES > $TARGET")
 
 # trees
 
@@ -139,7 +147,7 @@ for gene in genes:
                      Value(100),
                      Value("GTRGAMMA")],
                     "bash $SOURCES $CPUS scratch/trees/{0} sample.{1} > $TARGET".format(gene, i),
-                    cpus=20)
+                    cpus=16)
 
     env.Command(["scratch/trees/{}/RAxML_bestTree.samples".format(gene)],
                 ["scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i) for i in range(nsamples)],
@@ -161,7 +169,7 @@ for gene in genes:
                      Value(100),
                      Value("GTRGAMMA")],
                     "bash $SOURCES $CPUS scratch/trees/{} {} > $TARGET".format(gene, name),
-                    cpus=20)
+                    cpus=16)
 
 # compute all pairwise intra-patient genetic distances
 

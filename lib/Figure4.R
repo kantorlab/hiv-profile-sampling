@@ -51,7 +51,7 @@ for (i in seq(1, length(infiles), 2))
     genes <- c(genes, gene)
 
     # Load tree
-    tree <- root(read.tree(treefile), "MC50")
+    tree <- read.tree(treefile)
 
     # Load cluster support
     support <- read_csv(clusterfile) %>% filter(get(name) == 1)
