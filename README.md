@@ -20,6 +20,10 @@ Setup your scratch directory on Oscar:
     mkdir -p /gpfs/scratch/$USER/hiv-profile-sampling
     ln -s /gpfs/scratch/$USER/hiv-profile-sampling scratch
 
+To download the singularity container for OMM-MACSE, run:
+
+    cd scratch && singularity pull library://vranwez/default/omm_macse:sha256.096cd4607b78cd6aaf0d8af1e232e43824405320d155c5343f9c0a713595976c
+
 ## Running
 
 The run order and dependencies of the scripts are specified in the SConstruct

@@ -37,7 +37,6 @@ def SrunCommand(targets, sources, cmd, wrap=False, prefix="", cpus=1, mem_per_cp
         cmd = "{} {}".format(prefix, cmd)
     return env.Command(targets, sources, cmd)
 
-
 for gene in sum(genes.values(), []):
 
     # samples
@@ -90,12 +89,19 @@ for gene in sum(genes.values(), []):
                     "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
 
     SrunCommand(["scratch/aligned/{}/consensus.aa.fa".format(gene),
-                 "scratch/aligned/{}/consensus.fa".format(gene),
-                 "scratch/aligned/{}/consensus.fa.log".format(gene)],
+                 "scratch/aligned/{}/consensus.nt.fa".format(gene),
+                 "scratch/aligned/{}/consensus.aa.fa.log".format(gene)],
                 ["lib/codon-align-outgroup.py",
                  "scratch/unaligned/{}/consensus.fa".format(gene),
                  "data/outgroup.{}.fa".format(gene)],
                 "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
+
+    SrunCommand(["scratch/aligned/{}/consensus.fa".format(gene),
+                 "scratch/aligned/{}/consensus.fa.log".format(gene)],
+                ["lib/omm_macse.sh",
+                 "scratch/aligned/{}/consensus.nt.fa".format(gene)],
+                "bash $SOURCES ${TARGETS[0]} > ${TARGETS[1]}",
+                mem_per_cpu=4)
 
     SrunCommand(["scratch/aligned/{}/sanger.aa.fa".format(gene),
                  "scratch/aligned/{}/sanger.fa".format(gene),

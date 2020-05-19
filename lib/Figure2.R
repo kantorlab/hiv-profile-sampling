@@ -32,8 +32,8 @@ g <- ggplot(data, aes(x=X, y=Y)) +
      geom_point(data=filter(data,  is.na(Name)), shape=3, color="gray30", size=1, alpha=0.1, show.legend=FALSE) +
      geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3, color="black") +
      facet_grid(. ~ Gene) +
-     xlim(-0.06, 0.06) +
-     ylim(-0.06, 0.06) +
+     xlim(-0.25, 0.25) +
+     ylim(-0.25, 0.25) +
      labs(x="MDS Axis 1", y="MDS Axis 2") +
      theme_minimal() +
      theme(legend.position="bottom",
