@@ -9,13 +9,8 @@ env.CacheDir(cache_dir)
 env.Decider("MD5-timestamp")
 
 datasets = [14, 17, 20, 21, 23, 24, 25, 26, 27, 28, 29, 31, 32, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 58, 59, 60]
-
-genes = {
-    "prrt": ["prrt"],
-    "int":  ["int"],
-    "wgs":  ["gag", "pol", "vif", "vpr", "tat", "vpu", "env", "nef"]
-}
-
+genes = ["prrt", "int", "env", "wgs"]
+wgs = ["gag", "prrt", "int", "vif", "vpr", "tat", "vpu", "env", "nef"]
 nsamples = 500
 
 np.random.seed(919047801)
@@ -37,11 +32,14 @@ def SrunCommand(targets, sources, cmd, wrap=False, prefix="", cpus=1, mem_per_cp
         cmd = "{} {}".format(prefix, cmd)
     return env.Command(targets, sources, cmd)
 
-for gene in sum(genes.values(), []):
+### UNALIGNED SEQUENCES ###
+
+for gene in wgs:
 
     # samples
 
     for i, dataset in enumerate(datasets):
+
         SrunCommand(["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset)],
                     ["lib/sample.py",
                      Value(nsamples),
@@ -50,11 +48,17 @@ for gene in sum(genes.values(), []):
                     "python $SOURCES $TARGETS".format(gene, dataset))
 
     for i in range(nsamples):
+
         env.Command(["scratch/unaligned/{}/sample.{}.fa".format(gene, i)],
                     ["lib/select-sample.py",
                      Value(i)] + \
                     ["scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset) for dataset in datasets],
                     "python $SOURCES > $TARGET")
+
+        env.Command(["scratch/unaligned/{}/sample.{}.outgroup.fa".format(gene, i)],
+                    ["scratch/unaligned/{}/sample.{}.fa".format(gene, i),
+                     "data/outgroup.{}.fa".format(gene)],
+                    "cat $SOURCES > $TARGET")
 
     # consensus
 
@@ -63,85 +67,80 @@ for gene in sum(genes.values(), []):
                                         for dataset in datasets],
                 "python $SOURCES $TARGETS")
 
+    env.Command(["scratch/unaligned/{}/consensus.outgroup.fa".format(gene)],
+                ["scratch/unaligned/{}/consensus.fa".format(gene),
+                 "data/outgroup.{}.fa".format(gene)],
+                "cat $SOURCES > $TARGET")
+
     # sanger
 
     env.Command(["scratch/unaligned/{}/sanger.fa".format(gene)],
                 ["{}/sanger.omm_macse.{}.fa".format(data_dir, gene)],
                 "sed -e 's/-//g' $SOURCE > $TARGET")
 
-    # alignments
+    env.Command(["scratch/unaligned/{}/sanger.outgroup.fa".format(gene)],
+                ["scratch/unaligned/{}/sanger.fa".format(gene),
+                 "data/outgroup.{}.fa".format(gene)],
+                "cat $SOURCES > $TARGET")
+
+### ALIGNED SEQUENCES ###
 
     for dataset in datasets:
-        SrunCommand(["scratch/aligned/{}/sample.MC{}.aa.fa".format(gene, dataset),
-                     "scratch/aligned/{}/sample.MC{}.fa".format(gene, dataset),
+
+        SrunCommand(["scratch/aligned/{}/sample.MC{}.fa".format(gene, dataset),
                      "scratch/aligned/{}/sample.MC{}.fa.log".format(gene, dataset)],
-                    ["lib/codon-align.py",
+                    ["lib/omm_macse.sh",
                      "scratch/unaligned/{}/sample.MC{}.fa".format(gene, dataset)],
-                    "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
+                     "bash $SOURCES ${TARGETS[0]} &> ${TARGETS[1]}",
+                    mem_per_cpu=4)
 
     for i in range(nsamples):
-        SrunCommand(["scratch/aligned/{}/sample.{}.aa.fa".format(gene, i),
-                     "scratch/aligned/{}/sample.{}.fa".format(gene, i),
+
+        SrunCommand(["scratch/aligned/{}/sample.{}.fa".format(gene, i),
                      "scratch/aligned/{}/sample.{}.fa.log".format(gene, i)],
-                    ["lib/codon-align-outgroup.py",
-                     "scratch/unaligned/{}/sample.{}.fa".format(gene, i),
-                     "data/outgroup.{}.fa".format(gene)],
-                    "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
+                    ["lib/omm_macse.sh",
+                     "scratch/unaligned/{}/sample.{}.outgroup.fa".format(gene, i)],
+                    "bash $SOURCES ${TARGETS[0]} &> ${TARGETS[1]}",
+                    mem_per_cpu=4)
 
-    SrunCommand(["scratch/aligned/{}/consensus.aa.fa".format(gene),
-                 "scratch/aligned/{}/consensus.nt.fa".format(gene),
-                 "scratch/aligned/{}/consensus.aa.fa.log".format(gene)],
-                ["lib/codon-align-outgroup.py",
-                 "scratch/unaligned/{}/consensus.fa".format(gene),
-                 "data/outgroup.{}.fa".format(gene)],
-                "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
+    for name in ("consensus", "sanger"):
 
-    SrunCommand(["scratch/aligned/{}/consensus.fa".format(gene),
-                 "scratch/aligned/{}/consensus.fa.log".format(gene)],
-                ["lib/omm_macse.sh",
-                 "scratch/aligned/{}/consensus.nt.fa".format(gene)],
-                "bash $SOURCES ${TARGETS[0]} > ${TARGETS[1]}",
-                mem_per_cpu=4)
-
-    SrunCommand(["scratch/aligned/{}/sanger.aa.fa".format(gene),
-                 "scratch/aligned/{}/sanger.fa".format(gene),
-                 "scratch/aligned/{}/sanger.fa.log".format(gene)],
-                ["lib/codon-align-outgroup-sanger.py",
-                 "scratch/unaligned/{}/sanger.fa".format(gene),
-                 "data/outgroup.{}.fa".format(gene)],
-                "python $SOURCES ${TARGETS[0]} ${TARGETS[1]} 2> ${TARGETS[2]}")
+        SrunCommand(["scratch/aligned/{}/{}.fa".format(gene, name),
+                     "scratch/aligned/{}/{}.fa.log".format(gene, name)],
+                    ["lib/omm_macse.sh",
+                     "scratch/unaligned/{}/{}.outgroup.fa".format(gene, name)],
+                    "bash $SOURCES ${TARGETS[0]} &> ${TARGETS[1]}",
+                    mem_per_cpu=4)
 
 # concatenate wgs alignments
 
 for dataset in datasets:
+
     env.Command(["scratch/aligned/wgs/sample.MC{}.fa".format(dataset)],
                 ["lib/concat.py"] + \
-                ["scratch/aligned/{}/sample.MC{}.fa".format(gene, dataset) for gene in genes["wgs"]],
+                ["scratch/aligned/{}/sample.MC{}.fa".format(gene, dataset) for gene in wgs],
                 "python $SOURCES > $TARGET")
 
 for i in range(nsamples):
+
     env.Command(["scratch/aligned/wgs/sample.{}.fa".format(i)],
                 ["lib/concat.py"] + \
-                ["scratch/aligned/{}/sample.{}.fa".format(gene, i) for gene in genes["wgs"]],
+                ["scratch/aligned/{}/sample.{}.fa".format(gene, i) for gene in wgs],
                 "python $SOURCES > $TARGET")
 
-env.Command(["scratch/aligned/wgs/consensus.fa"],
-            ["lib/concat.py"] + \
-            ["scratch/aligned/{}/consensus.fa".format(gene) for gene in genes["wgs"]],
-            "python $SOURCES > $TARGET")
+for name in ("consensus", "sanger"):
 
-env.Command(["scratch/aligned/wgs/sanger.fa"],
-            ["lib/concat.py"] + \
-            ["scratch/aligned/{}/sanger.fa".format(gene) for gene in genes["wgs"]],
-            "python $SOURCES > $TARGET")
+    env.Command(["scratch/aligned/wgs/{}.fa".format(name)],
+                ["lib/concat.py"] + \
+                ["scratch/aligned/{}/{}.fa".format(gene, name) for gene in wgs],
+                "python $SOURCES > $TARGET")
 
-# trees
-
-genes = ["prrt", "int", "env", "wgs"]
+### TREES ###
 
 for gene in genes:
 
     for i in range(nsamples):
+
         SrunCommand(["scratch/trees/{}/sample.{}.log".format(gene, i),
                      "scratch/trees/{}/RAxML_info.sample.{}".format(gene, i),
                      "scratch/trees/{}/RAxML_bestTree.sample.{}".format(gene, i),
@@ -164,6 +163,7 @@ for gene in genes:
                 "sed 's/:[\.0-9]*//g' $SOURCE > $TARGET")
 
     for name in ("consensus", "sanger"):
+
         SrunCommand(["scratch/trees/{}/{}.log".format(gene, name),
                      "scratch/trees/{}/RAxML_info.{}".format(gene, name),
                      "scratch/trees/{}/RAxML_bestTree.{}".format(gene, name),
