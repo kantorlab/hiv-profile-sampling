@@ -40,15 +40,15 @@ for cluster in sanger:
     support[cluster] = support.get(cluster, 0)
 
 # Prune redundant clusters
-clusters = list(support)
-while clusters:
-    cluster = clusters.pop(0).split(",")
-    if len(cluster) > 2:
-        for i in range(len(cluster)):
-            subcluster = ",".join(cluster[:i] + cluster[i+1:])
-            if subcluster in support:
-                support.pop(subcluster)
-            clusters.append(subcluster)
+#clusters = list(support)
+#while clusters:
+#    cluster = clusters.pop(0).split(",")
+#    if len(cluster) > 2:
+#        for i in range(len(cluster)):
+#            subcluster = ",".join(cluster[:i] + cluster[i+1:])
+#            if subcluster in support:
+#                support.pop(subcluster)
+#            clusters.append(subcluster)
 
 with open(outfile, "w") as f:
     print("cluster,N,support,consensus,sanger", file=f)
