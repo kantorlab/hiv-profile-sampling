@@ -50,15 +50,20 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
                Name=factor(Name, levels=c("NGS Consensus", "Sanger Consensus")),
                Tips=factor(Tips, levels=c("FALSE", "TRUE"), labels=c("All Branches", "Tip Branches")))
 
-g <- ggplot(data, aes(x=Gene, y=BranchLengths)) +
+g <- ggplot(data, aes(x=Gene, y=BranchLengths, color=Gene)) +
      geom_violin(color=NA, fill="gray", show.legend=FALSE) +
-     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3, colour="black") +
-     expand_limits(y=0) +
+     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3) +
      labs(y="Sum of Branch Lengths in Tree") +
-     facet_grid(. ~ Tips) +
+     facet_grid(Tips ~ .) +
+     scale_y_continuous(limits=c(0, 6), breaks=seq(0, 6, 1)) +
+     scale_color_manual(values=c("#DF8F44", "#00A1D5", "#374E55", "#B24745")) +
+     coord_flip() +
      theme_minimal() +
      theme(legend.position="bottom",
            legend.title=element_blank(),
-	   panel.grid.major.x=element_blank())
+           panel.grid.minor=element_line(size=0.25),
+           panel.grid.major=element_line(size=0.25),
+           panel.grid.major.y=element_blank(),
+           axis.text=element_text(color="black"))
 
-ggsave(outfile, g, width=3.5, height=6.5, units="in")
+ggsave(outfile, g, width=6.5, height=4, units="in")

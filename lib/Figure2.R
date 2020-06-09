@@ -28,17 +28,21 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
                Y=Y) %>%
         arrange(Name)
 
-g <- ggplot(data, aes(x=X, y=Y)) +
+g <- ggplot(data, aes(x=X, y=Y, color=Gene)) +
      geom_point(data=filter(data,  is.na(Name)), shape=3, color="gray30", size=1, alpha=0.1, show.legend=FALSE) +
-     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3, color="black") +
+     geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3) +
      facet_grid(. ~ Gene) +
      xlim(-0.25, 0.25) +
      ylim(-0.25, 0.25) +
      labs(x="MDS Axis 1", y="MDS Axis 2") +
+     scale_color_manual(values=c("#DF8F44", "#00A1D5", "#374E55", "#B24745")) +
      theme_minimal() +
      theme(legend.position="bottom",
            legend.title=element_blank(),
+           panel.grid.minor=element_line(size=0.25),
+           panel.grid.major=element_line(size=0.25),
+           axis.text=element_text(color="black"),
            axis.text.x=element_text(angle=90, size=7, vjust=0.5, hjust=0.95),
-	   axis.text.y=element_text(size=7))
+           axis.text.y=element_text(size=7))
 
 ggsave(outfile, g, width=6.5, height=3, units="in")

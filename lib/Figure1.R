@@ -39,13 +39,17 @@ print(data %>%
 env <- filter(data, Gene=="env") %>% arrange(Diversity)
 data <- mutate(data, Dataset=factor(Dataset, levels=env$Dataset))
 
-g <- ggplot(data, aes(x=Dataset, y=Diversity, colour=Gene)) +
-     geom_point(size=2, shape=21, fill=NA) +
-     labs(x="Patient", y="Within-Host Diversity") +
-     scale_y_continuous(labels=scales::percent_format(accuracy=1)) +
-     scale_colour_manual(values=c("black", "gray50", "red3", "#56B4E9")) +
-     theme_classic() +
-     theme(legend.position="right",
+g <- ggplot(data, aes(x=Dataset, y=Diversity, color=Gene, group=Gene)) +
+     geom_point(size=1) +
+     facet_grid(Gene ~ .) +
+     labs(x="Patient", y="Within-Host Diversity", y2="Gene") +
+     scale_y_continuous(limits=c(0, 0.04), breaks=c(0.01, 0.02, 0.03, 0.04), labels=scales::percent_format(accuracy=1)) +
+     scale_color_manual(values=c("#DF8F44", "#00A1D5", "#374E55", "#B24745")) +
+     theme(legend.position="none",
+           panel.grid.minor=element_line(size=0.25),
+           panel.grid.major=element_line(size=0.25),
+           axis.ticks=element_blank(),
+           axis.text=element_text(color="black"),
            axis.text.x=element_text(angle=90, vjust=0.5))
 
-ggsave(outfile, g, width=6.5, height=2.5, units="in")
+ggsave(outfile, g, width=6.5, height=5, units="in")
