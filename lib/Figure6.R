@@ -39,13 +39,13 @@ for (gene in c("wgs", "env", "prrt")) {
     data[which(data$Gene == gene & data$Cluster == "MC47,MC56"), c("Support")] <- data[which(data$Gene == gene & data$Cluster == "MC47,MC56"), c("Support")] +
                                                                                   data[which(data$Gene == gene & data$Cluster == "MC41,MC47,MC56"), c("Support")]
 }
+data[which(data$Gene == "env" & data$Cluster == "MC17,MC21"), c("Consensus")] <- "Both"
 data[which(data$Gene == "wgs" & data$Cluster == "MC47,MC56"), c("Support")] <- data[which(data$Gene == "wgs" & data$Cluster == "MC47,MC56"), c("Support")] +
                                                                                data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC41,MC47,MC53,MC56"), c("Support")]
 data[which(data$Gene == "wgs" & data$Cluster == "MC41,MC47,MC56"), c("Support")] <- data[which(data$Gene == "wgs" & data$Cluster == "MC41,MC47,MC56"), c("Support")] +
                                                                                     data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC41,MC47,MC53,MC56"), c("Support")]
 data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC53"), c("Support")] <- data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC53"), c("Support")] +
                                                                                data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC41,MC47,MC53,MC56"), c("Support")]
-#
 # Order genes
 data$Gene <- factor(data$Gene, levels=c("prrt", "int", "env", "wgs"))
 
@@ -60,7 +60,7 @@ g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Consensus, label=Percent, alpha=Su
      geom_tile(color=NA) +
      geom_text(size=3.3, color="black") +
      scale_fill_manual(values=c("Both"="#ffffbf", "NGS Consensus"="#fc8d59", "Sanger Consensus"="#99d594", "Neither"="white")) +
-     scale_alpha_continuous(labels=scales::percent_format()) +
+     scale_alpha_continuous(name="Cluster Support %", labels=scales::percent_format()) +
      theme(legend.position="right",
            panel.background=element_blank(),
            axis.text.x=element_text(angle=90))
