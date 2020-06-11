@@ -56,11 +56,10 @@ data$Consensus <- factor(data$Consensus, levels=c("NGS Consensus", "Sanger Conse
 data$Percent <- paste0(formatC(data$Support, format="f", digits=1), "%")
 data$Support <- data$Support * 0.01
 
-g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Consensus, label=Percent, alpha=Support)) +
+g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Consensus, label=Percent)) +
      geom_tile(color=NA) +
      geom_text(size=3.3, color="black") +
      scale_fill_manual(values=c("Both"="#ffffbf", "NGS Consensus"="#fc8d59", "Sanger Consensus"="#99d594", "Neither"="white")) +
-     scale_alpha_continuous(name="Cluster Support %", labels=scales::percent_format()) +
      theme(legend.position="right",
            panel.background=element_blank(),
            axis.text.x=element_text(angle=90))
