@@ -62,6 +62,6 @@ g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Consensus, label=Percent)) +
      scale_fill_manual(values=c("Both"="#ffffbf", "NGS Consensus"="#fc8d59", "Sanger Consensus"="#99d594", "Neither"="white")) +
      theme(legend.position="right",
            panel.background=element_blank(),
-           axis.text.x=element_text(angle=90))
+           axis.text.x=element_text(angle=90, vjust=0.5))
 
 ggsave(outfile, g, width=6.5, height=5, units="in")

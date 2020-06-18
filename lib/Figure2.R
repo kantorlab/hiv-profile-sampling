@@ -29,7 +29,7 @@ data <- tibble(Gene=factor(Gene, levels=c("prrt", "int", "env", "wgs")),
         arrange(Name)
 
 g <- ggplot(data, aes(x=X, y=Y, color=Gene)) +
-     geom_point(data=filter(data,  is.na(Name)), shape=3, color="gray30", size=1, alpha=0.1, show.legend=FALSE) +
+     geom_point(data=filter(data,  is.na(Name)), shape=3, size=3, alpha=0.1) +
      geom_point(aes(shape=Name), data=filter(data, !is.na(Name)), size=3) +
      facet_grid(. ~ Gene) +
      xlim(-0.25, 0.25) +
