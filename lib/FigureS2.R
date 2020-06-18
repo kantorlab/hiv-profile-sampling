@@ -1,6 +1,7 @@
 library(ape)
 library(tidyverse)
 library(ggtree)
+library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 infiles <- args[1:(length(args)-1)]
@@ -78,6 +79,6 @@ for (i in seq(1, length(infiles), 2))
 
 N <- length(plots) / 2
 
-pdf(outfile, width=18, height=6)
+emf(outfile, width=18, height=6)
 multiplot(plotlist=plots, ncol=4, labels=genes)
 dev.off()
