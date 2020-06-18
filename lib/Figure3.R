@@ -1,5 +1,6 @@
 library(ape)
 library(tidyverse)
+library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 filenames <- args[1:(length(args)-1)]
@@ -66,4 +67,6 @@ g <- ggplot(data, aes(x=Gene, y=BranchLengths, color=Gene)) +
            panel.grid.major.y=element_blank(),
            axis.text=element_text(color="black"))
 
-ggsave(outfile, g, width=6.5, height=4, units="in")
+emf(outfile, width=6.5, height=4)
+print(g)
+dev.off()

@@ -251,50 +251,49 @@ for gene in genes:
 
 # figures
 
-env.Command(["manuscript/Figure1.pdf", "manuscript/Figure1.log"],
+env.Command(["manuscript/Figure1.emf", "manuscript/Figure1.log"],
             ["lib/Figure1.R"] + \
             ["scratch/aligned/{}/distances.MC{}.csv".format(gene, dataset) for gene in genes for dataset in datasets],
             "Rscript $SOURCES $TARGET > ${TARGETS[1]}")
 
-env.Command(["manuscript/Figure2.pdf",
-             "manuscript/Figure2.log"],
+env.Command(["manuscript/Figure2.emf", "manuscript/Figure2.log"],
             ["lib/Figure2.R"] + \
             ["scratch/trees/mds.{}.RData".format(gene) for gene in genes],
             "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
 
-env.Command(["manuscript/Figure3.pdf"],
+env.Command(["manuscript/Figure3.emf"],
             ["lib/Figure3.R"] + \
             ["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes] + \
             ["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes] + \
             ["scratch/trees/{}/RAxML_bestTree.samples".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
-env.Command(["manuscript/Figure4.pdf"],
+env.Command(["manuscript/Figure4.emf"],
             ["lib/Figure4.R"] + \
-            list(zip(["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
-                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
-            "Rscript $SOURCES $TARGET")
-
-env.Command(["manuscript/Figure5.pdf"],
-            ["lib/Figure4.R"] + \
-            list(zip(["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes],
-                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
-            "Rscript $SOURCES $TARGET")
-
-env.Command(["manuscript/Figure6.pdf"],
-            ["lib/Figure6.R"] + \
             ["scratch/clusters/{}/support.csv".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
-env.Command(["manuscript/Figure7.pdf"],
-            ["lib/Figure7.R"] + \
+env.Command(["manuscript/Figure5.emf"],
+            ["lib/Figure5.R"] + \
             ["scratch/clusters/{}/support.csv".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
-env.Command(["manuscript/FigureS1.pdf",
+env.Command(["manuscript/FigureS1.emf",
              "manuscript/FigureS1.log"],
             ["lib/FigureS1.R",
              "scratch/trees/mds.RData"],
             "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
+
+env.Command(["manuscript/FigureS2.emf"],
+            ["lib/FigureS2.R"] + \
+            list(zip(["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
+                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
+            "Rscript $SOURCES $TARGET")
+
+env.Command(["manuscript/FigureS3.emf"],
+            ["lib/FigureS2.R"] + \
+            list(zip(["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes],
+                     ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
+            "Rscript $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4

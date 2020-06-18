@@ -1,83 +1,70 @@
 library(ape)
 library(tidyverse)
 library(ggtree)
+library(gridExtra)
+library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 infiles <- args[1:(length(args)-1)]
 outfile <- args[length(args)]
 
-plots <- list()
-genes <- c()
-colors <- list()
-
-kelly_palette <- c(
-    red = "#be0032",
-    yellow = "#f3c300",
-    blue = "#0067a5",
-    olivegreen = "#2b3d26",
-    yellowgreen = "#8db600",
-    purplishpink = "#e68fac",
-    orange = "#f38400",
-    purple = "#875692",
-    reddishbrown = "#882d17",
-    green = "#008856",
-    buff = "#c2b280",
-    lightblue = "#a1caf1",
-    yellowishpink = "#f99379",
-    gray = "#848482",
-    yellowishbrown = "#654522",
-    reddishorange = "#e25822",
-    purplishred = "#b3446c",
-    greenishyellow = "#dcd300",
-    orangeyellow = "#f6a600",
-    violet = "#604e97"
-)
-
-for (i in seq(1, length(infiles), 2))
-{
-    treefile = infiles[i]
-    clusterfile = infiles[i+1]
-
-    # Find tree name in filename path.
-    if (endsWith(treefile, "consensus")) {
-        name <- "consensus"
-    } else if (endsWith(treefile, "sanger")) {
-        name <- "sanger"
-    }
+data <- bind_rows(lapply(infiles, function(infile) {
 
     # Find gene name in filename path.
-    path <- str_split(treefile, "/")[[1]]
+    path <- str_split(infile, "/")[[1]]
     gene <- path[length(path)-1]
-    genes <- c(genes, gene)
-
-    # Load tree
-    tree <- read.tree(treefile)
 
     # Load cluster support
-    support <- read_csv(clusterfile) %>% filter(get(name) == 1)
-    support$tips <- lapply(support$cluster, function(x) strsplit(x, ",")[[1]])
-    support$MRCA <- sapply(support$tips, function(x) getMRCA(tree, x))
-    print(support)
+    read_csv(infile) %>% mutate(Cluster=cluster,
+                                Gene=gene,
+                                Support=support,
+                                Consensus=case_when(consensus == 1 & sanger == 1 ~ "Both",
+                                                    consensus == 1               ~ "NGS Consensus",
+                                                    sanger == 1                  ~ "Sanger Consensus",
+                                                    TRUE                         ~ "Neither")) %>%
+                         select(Cluster, Gene, Support, Consensus)
+}))
 
-    # Plot tree
-    xscale <- max(node.depth.edgelength(tree))
-    g <- ggtree(tree) +
-         geom_tiplab(size=2) +
-         geom_treescale(y=-1) +
-         xlim_tree(1.1*xscale) +
-         theme(plot.title=element_text(face="bold"))
-    for (i in 1:nrow(support)) {
-        cluster <- support$cluster[i]
-        if (!(cluster %in% names(colors))) {
-            colors[[cluster]] <- kelly_palette[length(colors)+1]
-        }
-        g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=0.1*xscale, color=colors[[cluster]])
-    }
-    plots[[gene]] <- g
+# Adjust subclusters
+data <- bind_rows(data,
+                  tibble(Gene=c("wgs", "prrt", "wgs", "env", "prrt"),
+                         Cluster=c("MC17,MC21", "MC17,MC21", "MC47,MC56", "MC47,MC56", "MC47,MC56"),
+                         Support=c(0, 0, 0, 0, 0),
+                         Consensus=c("Both", "Neither", "NGS Consensus", "Sanger Consensus", "Neither")))
+
+for (gene in c("wgs", "env", "int", "prrt")) {
+    data[which(data$Gene == gene & data$Cluster == "MC17,MC21"), c("Support")] <- data[which(data$Gene == gene & data$Cluster == "MC17,MC21"), c("Support")] +
+                                                                                  data[which(data$Gene == gene & data$Cluster == "MC17,MC20,MC21"), c("Support")]
 }
+for (gene in c("wgs", "env", "prrt")) {
+    data[which(data$Gene == gene & data$Cluster == "MC47,MC56"), c("Support")] <- data[which(data$Gene == gene & data$Cluster == "MC47,MC56"), c("Support")] +
+                                                                                  data[which(data$Gene == gene & data$Cluster == "MC41,MC47,MC56"), c("Support")]
+}
+data[which(data$Gene == "env" & data$Cluster == "MC17,MC21"), c("Consensus")] <- "Both"
+data[which(data$Gene == "wgs" & data$Cluster == "MC47,MC56"), c("Support")] <- data[which(data$Gene == "wgs" & data$Cluster == "MC47,MC56"), c("Support")] +
+                                                                               data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC41,MC47,MC53,MC56"), c("Support")]
+data[which(data$Gene == "wgs" & data$Cluster == "MC41,MC47,MC56"), c("Support")] <- data[which(data$Gene == "wgs" & data$Cluster == "MC41,MC47,MC56"), c("Support")] +
+                                                                                    data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC41,MC47,MC53,MC56"), c("Support")]
+data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC53"), c("Support")] <- data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC53"), c("Support")] +
+                                                                               data[which(data$Gene == "wgs" & data$Cluster == "MC37,MC41,MC47,MC53,MC56"), c("Support")]
+# Order genes
+data$Gene <- factor(data$Gene, levels=c("prrt", "int", "env", "wgs"))
 
-N <- length(plots) / 2
+# Order consensus
+data$Consensus <- factor(data$Consensus, levels=c("NGS Consensus", "Sanger Consensus", "Both", "Neither"))
 
-pdf(outfile, width=18, height=6)
-multiplot(plotlist=plots, ncol=4, labels=genes)
+# Percent support
+data$Percent <- paste0(formatC(data$Support, format="f", digits=1), "%")
+data$Support <- data$Support * 0.01
+
+g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Consensus, label=Percent)) +
+     geom_tile(color=NA) +
+     geom_text(size=3.3, color="black") +
+     scale_fill_manual(values=c("Both"="#ffffbf", "NGS Consensus"="#fc8d59", "Sanger Consensus"="#99d594", "Neither"="white")) +
+     theme(legend.position="right",
+           panel.background=element_blank(),
+           axis.text.x=element_text(angle=90, vjust=0.5))
+
+emf(outfile, width=6.5, height=5)
+print(g)
 dev.off()

@@ -1,4 +1,5 @@
 library(tidyverse)
+library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 mdsfile <- args[1]
@@ -27,4 +28,6 @@ g <- ggplot(data, aes(x=X, y=Y, color=Gene)) +
            strip.text=element_text(size=11),
            legend.text=element_text(size=11))
 
-ggsave(outfile, g, width=6.5, height=6.5, units="in")
+emf(outfile, width=6.5, height=6.5)
+print(g)
+dev.off()

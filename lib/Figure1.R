@@ -1,4 +1,5 @@
 library(tidyverse)
+library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 distfiles <- args[1:(length(args)-1)]
@@ -52,4 +53,6 @@ g <- ggplot(data, aes(x=Dataset, y=Diversity, color=Gene, group=Gene)) +
            axis.text=element_text(color="black"),
            axis.text.x=element_text(angle=90, vjust=0.5))
 
-ggsave(outfile, g, width=6.5, height=5, units="in")
+emf(outfile, width=6.5, height=5)
+print(g)
+dev.off()

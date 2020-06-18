@@ -2,6 +2,7 @@ library(ape)
 library(tidyverse)
 library(ggtree)
 library(gridExtra)
+library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 infiles <- args[1:(length(args)-1)]
@@ -56,12 +57,13 @@ data$Consensus <- factor(data$Consensus, levels=c("NGS Consensus", "Sanger Conse
 data$Percent <- paste0(formatC(data$Support, format="f", digits=1), "%")
 data$Support <- data$Support * 0.01
 
-g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Consensus, label=Percent)) +
+g <- ggplot(data, aes(x=Gene, y=Cluster, fill=Support)) +
      geom_tile(color=NA) +
-     geom_text(size=3.3, color="black") +
-     scale_fill_manual(values=c("Both"="#ffffbf", "NGS Consensus"="#fc8d59", "Sanger Consensus"="#99d594", "Neither"="white")) +
+     scale_fill_gradient(name="Cluster Support %", low="#fee8c8", high="#e34a33", labels=scales::percent(0.25*0:4), breaks=0.25*0:4) +
      theme(legend.position="right",
            panel.background=element_blank(),
            axis.text.x=element_text(angle=90, vjust=0.5))
 
-ggsave(outfile, g, width=6.5, height=5, units="in")
+emf(outfile, width=6.5, height=5)
+print(g)
+dev.off()
