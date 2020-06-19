@@ -1,6 +1,8 @@
 library(ape)
 library(tidyverse)
 library(ggtree)
+library(gridExtra)
+library(grid)
 library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -66,19 +68,18 @@ for (i in seq(1, length(infiles), 2))
          geom_tiplab(size=2) +
          geom_treescale(y=-1) +
          xlim_tree(1.1*xscale) +
+         ggtitle(gene) +
          theme(plot.title=element_text(face="bold"))
     for (i in 1:nrow(support)) {
         cluster <- support$cluster[i]
         if (!(cluster %in% names(colors))) {
             colors[[cluster]] <- kelly_palette[length(colors)+1]
         }
-        g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=0.1*xscale, color=colors[[cluster]])
+        g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=0.1*xscale, color=colors[[cluster]], size=2)
     }
     plots[[gene]] <- g
 }
 
-N <- length(plots) / 2
-
-emf(outfile, width=18, height=6)
-multiplot(plotlist=plots, ncol=4, labels=genes)
+emf(outfile, width=6.5, height=8)
+grid.arrange(grobs=plots, ncol=2, nrow=2)
 dev.off()
