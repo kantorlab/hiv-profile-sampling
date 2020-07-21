@@ -1,9 +1,9 @@
-# A tibble: 4 x 3
-  Gene       Min    Max
-  <fct>    <dbl>  <dbl>
-1 prrt  0.00169  0.0188
-2 int   0.000616 0.0199
-3 env   0.00163  0.0386
-4 wgs   0.00239  0.0261
+# A tibble: 4 x 4
+  Gene       Min    Max    Mean
+  <fct>    <dbl>  <dbl>   <dbl>
+1 prrt  0.00169  0.0188 0.00916
+2 int   0.000616 0.0199 0.00867
+3 env   0.00163  0.0386 0.0149 
+4 wgs   0.00239  0.0261 0.0117 
 null device 
           1 
