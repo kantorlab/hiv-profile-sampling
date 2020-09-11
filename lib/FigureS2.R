@@ -1,9 +1,10 @@
-library(ape)
 library(tidyverse)
 library(ggtree)
 library(gridExtra)
 library(grid)
 library(devEMF)
+library(ape)
+library(treeio)
 
 args <- commandArgs(trailingOnly=TRUE)
 infiles <- args[1:(length(args)-1)]
@@ -11,30 +12,6 @@ outfile <- args[length(args)]
 
 plots <- list()
 genes <- c()
-colors <- list()
-
-kelly_palette <- c(
-    red = "#be0032",
-    yellow = "#f3c300",
-    blue = "#0067a5",
-    olivegreen = "#2b3d26",
-    yellowgreen = "#8db600",
-    purplishpink = "#e68fac",
-    orange = "#f38400",
-    purple = "#875692",
-    reddishbrown = "#882d17",
-    green = "#008856",
-    buff = "#c2b280",
-    lightblue = "#a1caf1",
-    yellowishpink = "#f99379",
-    gray = "#848482",
-    yellowishbrown = "#654522",
-    reddishorange = "#e25822",
-    purplishred = "#b3446c",
-    greenishyellow = "#dcd300",
-    orangeyellow = "#f6a600",
-    violet = "#604e97"
-)
 
 for (i in seq(1, length(infiles), 2))
 {
@@ -54,32 +31,37 @@ for (i in seq(1, length(infiles), 2))
     genes <- c(genes, gene)
 
     # Load tree
-    tree <- read.tree(treefile)
+    tree <- drop.tip(read.raxml(treefile), "outgroup")
 
     # Load cluster support
-    support <- read_csv(clusterfile) %>% filter(get(name) == 1)
+    support <- read_csv(clusterfile)
     support$tips <- lapply(support$cluster, function(x) strsplit(x, ",")[[1]])
-    support$MRCA <- sapply(support$tips, function(x) getMRCA(tree, x))
+    support$level <- sapply(support$cluster, function(x) str_count(x, ","))
+    support$MRCA <- sapply(support$tips, function(x) getMRCA(as.phylo(tree), x))
     print(support)
 
     # Plot tree
-    xscale <- max(node.depth.edgelength(tree))
+    #xscale <- max(node.depth.edgelength(tree))
+    xscale <- 0.4
     g <- ggtree(tree) +
-         geom_tiplab(size=2) +
-         geom_treescale(y=-1) +
+         geom_tiplab(size=1.8, hjust=-0.1) +
+         geom_treescale(y=-1, width=0.01, fontsize=1.8) +
          xlim_tree(1.1*xscale) +
          ggtitle(gene) +
+	 geom_text2(aes(subset=(!isTip & bootstrap >= 70), label=bootstrap), hjust=1.2, nudge_y=0.5, size=1.5) +
          theme(plot.title=element_text(face="bold"))
+    support <- filter(support, support >= 1)
+    for (i in 1:nrow(support)) {
+        g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=(0.09 + 0.04*support$level[i])*xscale, color="blue", hjust=-0.2, size=1, fontsize=1.8)
+    }
+    support <- filter(support, get(name) == 1)
     for (i in 1:nrow(support)) {
         cluster <- support$cluster[i]
-        if (!(cluster %in% names(colors))) {
-            colors[[cluster]] <- kelly_palette[length(colors)+1]
-        }
-        g <- g + geom_cladelabel(support$MRCA[i], label=round(support$support[i]), offset=0.1*xscale, color=colors[[cluster]], size=2)
+      	g <- g + geom_cladelabel(support$MRCA[i], label="", offset=(0.08 + 0.04*support$level[i])*xscale, color="red", size=1)
     }
     plots[[gene]] <- g
 }
 
-emf(outfile, width=6.5, height=8)
+pdf(outfile, width=6.5, height=8)
 grid.arrange(grobs=plots, ncol=2, nrow=2)
 dev.off()

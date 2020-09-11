@@ -256,7 +256,7 @@ env.Command(["manuscript/Figure1.emf", "manuscript/Figure1.log"],
             ["scratch/aligned/{}/distances.MC{}.csv".format(gene, dataset) for gene in genes for dataset in datasets],
             "Rscript $SOURCES $TARGET > ${TARGETS[1]}")
 
-env.Command(["manuscript/Figure2.emf", "manuscript/Figure2.log"],
+env.Command(["manuscript/Figure2.pdf", "manuscript/Figure2.log"],
             ["lib/Figure2.R"] + \
             ["scratch/trees/mds.{}.RData".format(gene) for gene in genes],
             "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
@@ -278,21 +278,21 @@ env.Command(["manuscript/Figure5.emf"],
             ["scratch/clusters/{}/support.csv".format(gene) for gene in genes],
             "Rscript $SOURCES $TARGET")
 
-env.Command(["manuscript/FigureS1.emf",
+env.Command(["manuscript/FigureS1.pdf",
              "manuscript/FigureS1.log"],
             ["lib/FigureS1.R",
              "scratch/trees/mds.RData"],
             "Rscript $SOURCES ${TARGETS[0]} > ${TARGETS[1]}")
 
-env.Command(["manuscript/FigureS2.emf"],
+env.Command(["manuscript/FigureS2.pdf"],
             ["lib/FigureS2.R"] + \
-            list(zip(["scratch/trees/{}/RAxML_bestTree.consensus".format(gene) for gene in genes],
+            list(zip(["scratch/trees/{}/RAxML_bipartitionsBranchLabels.consensus".format(gene) for gene in genes],
                      ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
             "Rscript $SOURCES $TARGET")
 
-env.Command(["manuscript/FigureS3.emf"],
+env.Command(["manuscript/FigureS3.pdf"],
             ["lib/FigureS2.R"] + \
-            list(zip(["scratch/trees/{}/RAxML_bestTree.sanger".format(gene) for gene in genes],
+            list(zip(["scratch/trees/{}/RAxML_bipartitionsBranchLabels.sanger".format(gene) for gene in genes],
                      ["scratch/clusters/{}/support.csv".format(gene) for gene in genes])),
             "Rscript $SOURCES $TARGET")
 

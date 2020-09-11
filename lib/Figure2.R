@@ -1,5 +1,4 @@
 library(tidyverse)
-library(devEMF)
 
 args <- commandArgs(trailingOnly=TRUE)
 mdsfiles <- args[1:(length(args)-1)]
@@ -46,6 +45,6 @@ g <- ggplot(data, aes(x=X, y=Y, color=Gene)) +
            axis.text.x=element_text(angle=90, size=7, vjust=0.5, hjust=0.95),
            axis.text.y=element_text(size=7))
 
-emf(outfile, width=6.5, height=3)
+pdf(outfile, width=6.5, height=3)
 print(g)
 dev.off()
